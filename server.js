@@ -49,8 +49,8 @@ app.post('/', (request, response) => {
 			year: new Date().getFullYear(),
 			gamename: `Game Name: ${result.name}`,
 			price: `Current Price: $${current_price.toString()}`,
-			score: `Metacritic Score: %${result.metacritic.score}`,
-			discount: `Discount %${discount_percentage}`
+			score: `Metacritic Score: ${result.metacritic.score}%`,
+			discount: `Discount ${discount_percentage}%`
 		});
 	}).catch((error)=>{
 
