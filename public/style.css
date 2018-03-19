@@ -1,0 +1,38 @@
+/*
+style.css
+
+Challenge 8
+
+Robert Janzen - A01029341 2B
+*/
+
+body {
+	font-family: 'Lato', sans-serif;
+}
+
+a {
+	color:black;
+	font-size:2em;
+	font-style:normal;
+}
+
+h1 {
+	font-size:4em;
+}
+
+h2 {
+	font-size:3em;
+}
+
+#container {
+	position:absolute;
+	margin:auto;
+	left:0px;
+	right:0px;
+	top:0px;
+	bottom:0px;
+	width:80vw;
+	height:80vh;
+	border-style:dashed;
+	padding:15px;
+}
