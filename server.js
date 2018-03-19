@@ -1,10 +1,16 @@
 const express = require('express');
 const request = require('request');
+const bodyParser = require('body-parser');
 
+var app = express();
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 const serverPort = 8080;
 
-var app = express();
+
 
 app.use(express.static(__dirname + '/public'));
 
