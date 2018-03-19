@@ -5,7 +5,7 @@ const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
-const server = require('./server.js')
+const server = require('./server.js');
 var mysql = server.mysql;
 var connectoin = server.connection;
 
