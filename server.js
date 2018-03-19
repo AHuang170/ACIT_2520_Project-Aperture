@@ -9,15 +9,14 @@ app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
-	var g_name = '';
 	steam('20').then((result)=>{
 		response.render('index.hbs', {
 		game_name: result
-	});
+		});
 	}).catch((error)=>{
 		response.render('index.hbs', {
 		game_name: 'error'
-	});
+		});
 	})
 });
 
