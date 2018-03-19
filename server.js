@@ -41,9 +41,9 @@ app.post('/', (request, response) => {
 		response.render('index.hbs', {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
-			gamename: result.name,
-			price: (parseInt(result.price_overview.initial)/100).toString(),
-			score: result.metacritic.score
+			gamename: `Game Name: ${result.name}`,
+			price: `Price: $${(parseInt(result.price_overview.initial)/100).toString()}`,
+			score: `Metacritic Score: %${result.metacritic.score}`
 		});
 	}).catch((error)=>{
 
