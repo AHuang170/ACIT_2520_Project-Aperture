@@ -2,6 +2,8 @@ const express = require('express');
 const request = require('request');
 const hbs = require('hbs');
 const fs = require('fs');
+const _ = require('lodash');
+const bodyParser = require('body-parser');
 const serverPort = 8080;
 
 var gamelist = fs.readFileSync('games.json');
@@ -11,6 +13,9 @@ var app = express();
 hbs.registerPartials(__dirname + '/views/partials');
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 hbs.registerHelper('getCurrentYear', () => {
 	return new Date().getFullYear();
@@ -33,11 +38,8 @@ app.get('/', (request, response) => {
 });
 
 app.post('/', (request, response) => {
-	console.log('Request received');
-
-	console.log('Finding game...');
-	var info = gameobj['applist'].apps[100];
-	console.log(info);
+	var index = _.findIndex(gameobj['applist'].apps, function(o) { return o.name == request.body.game; });
+	console.log(gameobj['applist'].apps[index]);
 })
 
 app.get('/login', (request, response) => {

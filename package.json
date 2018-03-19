@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/AHuang170/ACIT_2520_Project-Aperture#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "hbs": "^4.0.1",
     "lodash": "^4.17.5",
