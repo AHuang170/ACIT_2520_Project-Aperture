@@ -18,7 +18,7 @@ app.get('/login', (request, response) => {
 
 app.use( (request, response) => {
 	response.status(404);
-	response.render('404.html');
+	response.render('404.hbs');
 });
 
 app.listen(8080, () => {
