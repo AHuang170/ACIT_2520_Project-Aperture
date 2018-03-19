@@ -1,28 +1,24 @@
 const express = require('express');
 const request = require('request');
-// const bodyParser = require('body-parser');
+const hbs = require('hbs');
+const serverPort = 8080;
 
 var app = express();
 
-// app.use(bodyParser.urlencoded({
-//   extended: true
-// }));
-
-const serverPort = 8080;
-
+app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
-	response.sendFile(__dirname + '/public/index.html');
+	response.render('index.hbs');
 });
 
 app.get('/login', (request, response) => {
-	response.sendFile(__dirname + '/public/login.html');
+	response.render('login.hbs');
 });
 
 app.use( (request, response) => {
 	response.status(404);
-	response.sendFile(__dirname + '/public/404.html');
+	response.render('404.html');
 });
 
 app.listen(8080, () => {
