@@ -5,13 +5,9 @@ const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
-var mysql = require('mysql');
-var connection = mysql.createConnection({
-	host: ''
-	user:
-	password:
-	database:
-});
+const server = require('./server.js')
+var mysql = server.mysql;
+var connectoin = server.connection;
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
