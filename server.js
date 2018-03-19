@@ -38,12 +38,19 @@ app.post('/', (request, response) => {
 	var appid = gameobj['applist'].apps[index].appid.toString();
 
 	steam(appid).then((result) => {
+
+		var initial_price = parseInt(result.price_overview.initial);
+		var discount_percentage = parseInt(result.price_overview.discount_percent);
+		var current_price =  (initial_price * (1 - (discount_percentage / 100))/100).toFixed(2);
+
 		response.render('index.hbs', {
+
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
 			gamename: `Game Name: ${result.name}`,
-			price: `Price: $${(parseInt(result.price_overview.initial)/100).toString()}`,
-			score: `Metacritic Score: %${result.metacritic.score}`
+			price: `Current Price: $${current_price.toString()}`,
+			score: `Metacritic Score: %${result.metacritic.score}`,
+			discount: `Discount %${discount_percentage}`
 		});
 	}).catch((error)=>{
 
