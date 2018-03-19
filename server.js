@@ -9,7 +9,16 @@ app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', (request, response) => {
-	response.render('index.hbs');
+	var g_name = '';
+	steam('20').then((result)=>{
+		response.render('index.hbs', {
+		game_name: result
+	});
+	}).catch((error)=>{
+		response.render('index.hbs', {
+		game_name: 'error'
+	});
+	})
 });
 
 app.get('/login', (request, response) => {
@@ -36,12 +45,9 @@ var steam = (game_id) => {
             url: 'http://store.steampowered.com/api/appdetails?appids=' + game_id,
             json: true
         }, (error, response, body) => {
-            if (error) {
-            	console.log('Error');
-                reject('Cannot connect to Steam Store');
-            } else if (body.status === 'OK') {
-				console.log(body);
-            }
+        	var test = `body[${game_id}].data.name`;
+        	console.log(eval(test));
+        	resolve(eval(test));
         });
     })
 
