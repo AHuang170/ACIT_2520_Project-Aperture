@@ -13,16 +13,21 @@ body {
 
 a {
 	color:black;
-	font-size:1em;
+	font-size:1.1em;
 	font-style:normal;
 }
 
+p, label {
+	color:black;
+	font-size:1.2em;
+}
+
 h1 {
-	font-size:4em;
+	font-size:3em;
 }
 
 h2 {
-	font-size:3em;
+	font-size:2.5em;
 }
 
 header {
