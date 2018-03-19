@@ -4,19 +4,26 @@ const hbs = require('hbs');
 const serverPort = 8080;
 
 var app = express();
-
+hbs.registerPartials(__dirname + '/views/partials');
 app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
+
+hbs.registerHelper('getCurrentYear', () => {
+	return new Date().getFullYear();
+})
+
+hbs.registerHelper('message', (text) => {
+	return text.toUpperCase();
+})
 
 app.get('/', (request, response) => {
 	steam('20').then((result)=>{
 		response.render('index.hbs', {
-		game_name: result
+			game_name: result,
+			year: new Date().getFullYear()
 		});
 	}).catch((error)=>{
-		response.render('index.hbs', {
-		game_name: 'error'
-		});
+		response.render('index.hbs'});
 	})
 });
 

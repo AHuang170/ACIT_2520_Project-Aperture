@@ -24,6 +24,15 @@ h2 {
 	font-size:3em;
 }
 
+footer {
+	position:absolute;
+	text-align:center;
+	left:0px;
+	right:0px;
+	bottom:20px;
+	margin:auto;
+}
+
 #container {
 	position:absolute;
 	margin:auto;
