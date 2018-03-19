@@ -23,7 +23,7 @@ app.get('/', (request, response) => {
 			year: new Date().getFullYear()
 		});
 	}).catch((error)=>{
-		response.render('index.hbs'});
+		response.render('index.hbs');
 	})
 });
 

@@ -12,7 +12,7 @@ body {
 
 a {
 	color:black;
-	font-size:2em;
+	font-size:1em;
 	font-style:normal;
 }
 
@@ -22,6 +22,10 @@ h1 {
 
 h2 {
 	font-size:3em;
+}
+
+header {
+	text-align:center;
 }
 
 footer {
@@ -34,6 +38,7 @@ footer {
 }
 
 #container {
+	text-align:left;
 	position:absolute;
 	margin:auto;
 	left:0px;
