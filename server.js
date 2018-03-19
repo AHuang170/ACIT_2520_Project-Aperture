@@ -39,8 +39,21 @@ app.get('/', (request, response) => {
 
 app.post('/', (request, response) => {
 	var index = _.findIndex(gameobj['applist'].apps, function(o) { return o.name == request.body.game; });
-	console.log(gameobj['applist'].apps[index]);
-})
+
+	var appid = gameobj['applist'].apps[index].appid.toString();
+
+	steam(appid).then((result) => {
+		response.render('index.hbs', {
+			logo: 'Steam_logo.png',
+			year: new Date().getFullYear(),
+			gamename: result.name,
+			price: (parseInt(result.price_overview.initial)/100).toString(),
+			score: result.metacritic.score
+		});
+	}).catch((error)=>{
+
+	});
+});
 
 app.get('/login', (request, response) => {
 	response.render('login.hbs');
@@ -61,7 +74,7 @@ var steam = (game_id) => {
             url: 'http://store.steampowered.com/api/appdetails?appids=' + game_id,
             json: true
         }, (error, response, body) => {
-        	var test = `body[${game_id}].data.name`;
+        	var test = `body[${game_id}].data`;
         	resolve(eval(test));
         });
     })
