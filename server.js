@@ -5,6 +5,11 @@ const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
+const MongoClient = require('mongodb').MongoClient
+
+MongoClient.connect('link-to-mongodb', (err, database) => {
+	// ... start the server
+});
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
