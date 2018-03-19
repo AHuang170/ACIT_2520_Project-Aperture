@@ -35,26 +35,33 @@ app.get('/', (request, response) => {
 app.post('/', (request, response) => {
 	var index = _.findIndex(gameobj['applist'].apps, function(o) { return o.name == request.body.game; });
 
-	var appid = gameobj['applist'].apps[index].appid.toString();
+	if (index != -1) {
+		var appid = gameobj['applist'].apps[index].appid.toString();
 
-	steam(appid).then((result) => {
+		steam(appid).then((result) => {
 
-		var initial_price = parseInt(result.price_overview.initial);
-		var discount_percentage = parseInt(result.price_overview.discount_percent);
-		var current_price =  (initial_price * (1 - (discount_percentage / 100))/100).toFixed(2);
+			var initial_price = parseInt(result.price_overview.initial);
+			var discount_percentage = parseInt(result.price_overview.discount_percent);
+			var current_price =  (initial_price * (1 - (discount_percentage / 100))/100).toFixed(2);
 
+			response.render('index.hbs', {
+				logo: 'Steam_logo.png',
+				year: new Date().getFullYear(),
+				gamename: `Game Name: ${result.name}`,
+				price: `Current Price: $${current_price.toString()}`,
+				score: `Metacritic Score: ${result.metacritic.score}%`,
+				discount: `Discount ${discount_percentage}%`
+			});
+		}).catch((error)=>{
+
+		});
+	} else {
 		response.render('index.hbs', {
-
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
-			gamename: `Game Name: ${result.name}`,
-			price: `Current Price: $${current_price.toString()}`,
-			score: `Metacritic Score: ${result.metacritic.score}%`,
-			discount: `Discount ${discount_percentage}%`
+			error: 'Game not found'
 		});
-	}).catch((error)=>{
-
-	});
+	}
 });
 
 app.get('/login', (request, response) => {
