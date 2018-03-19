@@ -20,6 +20,14 @@ app.get('/', (request, response) => {
 	})
 });
 
+app.post('/', (request, response) => {
+	console.log('Request received');
+
+	console.log('Finding game...');
+
+	// Look in games.json
+})
+
 app.get('/login', (request, response) => {
 	response.render('login.hbs');
 });
