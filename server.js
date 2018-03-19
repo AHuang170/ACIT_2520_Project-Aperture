@@ -5,9 +5,18 @@ const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
-const server = require('./server.js');
-var mysql = server.mysql;
-var connectoin = server.connection;
+const config = require('./config.js');
+var mysql = config.mysql;
+var connection = config.connection;
+
+connection.connect(function(err) {
+  if (err) {
+    console.error('Database connection failed: ' + err.stack);
+    return;
+  }
+
+  console.log('Connected to database.');
+});
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
@@ -92,3 +101,5 @@ var steam = (game_id) => {
     })
 
 };
+
+// connection.end();
