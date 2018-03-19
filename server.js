@@ -20,6 +20,7 @@ app.get('/', (request, response) => {
 	steam('20').then((result)=>{
 		response.render('index.hbs', {
 			game_name: result,
+			logo: 'Steam_logo.png',
 			year: new Date().getFullYear()
 		});
 	}).catch((error)=>{

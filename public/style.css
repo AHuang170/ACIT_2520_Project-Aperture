@@ -8,6 +8,7 @@ Robert Janzen - A01029341 2B
 
 body {
 	font-family: 'Lato', sans-serif;
+	background-color:rgb(218,220,222);
 }
 
 a {
@@ -49,4 +50,11 @@ footer {
 	height:80vh;
 	border-style:dashed;
 	padding:15px;
+	background-color:white;
+}
+
+#logo {
+	position:relative;
+	width:200px;
+	margin-bottom:-50px;
 }
