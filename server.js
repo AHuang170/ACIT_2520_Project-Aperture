@@ -31,11 +31,6 @@ app.use( (request, response) => {
 
 app.listen(8080, () => {
     console.log(`Server is up on the port ${serverPort}`);
-    steam('20').then((result) => {
-    	console.log('Success');
-	}, (errorMessage) => {
-	    console.log(errorMessage);
-	});
 });
 
 var steam = (game_id) => {
@@ -45,7 +40,6 @@ var steam = (game_id) => {
             json: true
         }, (error, response, body) => {
         	var test = `body[${game_id}].data.name`;
-        	console.log(eval(test));
         	resolve(eval(test));
         });
     })
