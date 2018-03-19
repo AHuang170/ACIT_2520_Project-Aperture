@@ -1,7 +1,11 @@
 const express = require('express');
 const request = require('request');
 const hbs = require('hbs');
+const fs = require('fs');
 const serverPort = 8080;
+
+var gamelist = fs.readFileSync('games.json');
+var gameobj = JSON.parse(gamelist);
 
 var app = express();
 hbs.registerPartials(__dirname + '/views/partials');
@@ -32,8 +36,8 @@ app.post('/', (request, response) => {
 	console.log('Request received');
 
 	console.log('Finding game...');
-
-	// Look in games.json
+	var info = gameobj['applist'].apps[100];
+	console.log(info);
 })
 
 app.get('/login', (request, response) => {

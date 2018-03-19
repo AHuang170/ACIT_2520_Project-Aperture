@@ -49,12 +49,13 @@ footer {
 	width:80vw;
 	height:80vh;
 	border-style:dashed;
-	padding:15px;
+	padding-left:30px;
 	background-color:white;
 }
 
 #logo {
 	position:relative;
 	width:200px;
-	margin-bottom:-50px;
+	margin-bottom:-60px;
+	margin-left:-20px;
 }
