@@ -18,6 +18,8 @@ connection.connect(function(err) {
   console.log('Connected to database.');
 });
 
+// connection.end();
+
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
 
@@ -102,4 +104,3 @@ var steam = (game_id) => {
 
 };
 
-// connection.end();
