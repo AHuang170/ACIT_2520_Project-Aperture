@@ -53,8 +53,8 @@ app.post('/', (request, response) => {
 		steam(appid).then((result) => {
 
 			var initial_price = parseInt(result.price_overview.initial);
-			var discount_percentage = parseInt(result.price_overview.discount_percent);
-			var current_price =  (initial_price * (1 - (discount_percentage / 100))/100).toFixed(2);
+			var disct_percentage = parseInt(result.price_overview.discount_percent);
+			var current_price =  (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
 
 			response.render('index.hbs', {
 				logo: 'Steam_logo.png',
@@ -62,7 +62,7 @@ app.post('/', (request, response) => {
 				gamename: `Game Name: ${result.name}`,
 				price: `Current Price: $${current_price.toString()}`,
 				score: `Metacritic Score: ${result.metacritic.score}%`,
-				discount: `Discount ${discount_percentage}%`
+				discount: `Discount ${disct_percentage}%`
 			});
 		}).catch((error)=>{
 
