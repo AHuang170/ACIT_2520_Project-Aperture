@@ -19,4 +19,14 @@ CREATE TABLE wishlist(
 );
 
 INSERT INTO users (uid, username, password)
-VALUES (NULL, 'rjanzen', 'testaccount')
+VALUES (NULL, 'rjanzen', 'hashedpass');
+
+INSERT INTO users (uid, username, password)
+VALUES (NULL, 'aldrich', 'hashedpass');
+
+INSERT INTO wishlist (uid, appid)
+VALUES
+  (1, 10),
+  (1, 20),
+  (1, 400),
+  (1, 420530);

@@ -15,7 +15,15 @@ connection.connect(function(err) {
     return;
   }
 
-  console.log('Connected to database.');
+  console.log('Connected to database with id: ' + connection.threadId);
+});
+
+var sql = 'SELECT * FROM wishlist';
+
+connection.query(sql, function(err, rows, fields) {
+  if (err) throw err
+
+  console.log(rows);
 });
 
 // connection.end();
