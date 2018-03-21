@@ -103,8 +103,3 @@ var steam = (game_id) => {
     })
 
 };
-
-<<<<<<< HEAD
-// connection.end();
-=======
->>>>>>> 8bb0a5b6e3f6af4b1f3eaa3ad415c8719e01961c
