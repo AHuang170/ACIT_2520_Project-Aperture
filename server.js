@@ -5,6 +5,8 @@ const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
+
+// -------------------------------- MySQL RDS --------------------------------
 const config = require('./config.js');
 var mysql = config.mysql;
 var connection = config.connection;
@@ -27,6 +29,7 @@ connection.query(sql, function(err, rows, fields) {
 });
 
 // connection.end();
+// ---------------------------------------------------------------------------
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
@@ -88,6 +91,10 @@ app.post('/', (request, response) => {
 
 app.get('/login', (request, response) => {
 	response.render('login.hbs');
+});
+
+app.get('/wishlist', (request, response) => {
+  response.render('wishlist.hbs');
 });
 
 app.use( (request, response) => {
