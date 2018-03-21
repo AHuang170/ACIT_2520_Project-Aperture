@@ -20,7 +20,7 @@ connection.connect(function(err) {
   console.log('Connected to database with id: ' + connection.threadId);
 });
 
-var sql = 'SELECT * FROM wishlist';
+var sql = 'SELECT * FROM users';
 
 connection.query(sql, function(err, rows, fields) {
   if (err) throw err
