@@ -6,7 +6,7 @@ const _ = require('lodash');
 const bodyParser = require('body-parser');
 const serverPort = 8080;
 
-// -------------------------------- MySQL RDS --------------------------------
+// --------------------------------- MySQL RDS ---------------------------------
 const config = require('./config.js');
 var mysql = config.mysql;
 var connection = config.connection;
@@ -29,7 +29,7 @@ connection.query(sql, function(err, rows, fields) {
 });
 
 // connection.end();
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
@@ -49,6 +49,8 @@ hbs.registerHelper('getCurrentYear', () => {
 hbs.registerHelper('message', (text) => {
 	return text.toUpperCase();
 })
+
+// ----------------------------------- Routes ----------------------------------
 
 app.get('/', (request, response) => {
 	response.render('index.hbs', {
