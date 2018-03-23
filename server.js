@@ -50,28 +50,30 @@ hbs.registerHelper('message', (text) => {
 })
 
 hbs.registerHelper('apps', (context, options) => {
-
+  var current_game = ''
+  var initial_price = 0;
+  var disct_price = 0;
+  var current_price = 0;
+  var price = '';
+  var score = 0;
+  var discount = 0;
   var out = "<div id='wishlist'>";
-  for(var i=0, l=context.gamename.length; i<l; i++) {
 
-    // steam(appid).then((result) => {
-    //
-    //   var initial_price = parseInt(result.price_overview.initial);
-    //   var disct_percentage = parseInt(result.price_overview.discount_percent);
-    //   var current_price =
-    //     (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-    //
-    //   response.render('index.hbs', {
-    //     logo: 'Steam_logo.png',
-    //     year: new Date().getFullYear(),
-    //             failedAuth: false,
-    //     gamename: `Game Name: ${result.name}`,
-    //     price: `Current Price: $${current_price.toString()}`,
-    //     score: `Metacritic Score: ${result.metacritic.score}%`,
-    //     discount: `Discount ${disct_percentage}%`
-    //   });
+  for(var i=0, l=context.gamelist.length; i<l; i++) {
+    current_game = context.gamelist[i].appid
 
-    out = out + "<div id='game'>" + steam(context.gamename[i].appid) + '</div>';
+    steam(current_game).then((result) => {
+      initial_price = parseInt(result.price_overview.initial);
+      disct_percentage = parseInt(result.price_overview.discount_percent);
+      current_price =
+        (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+        // gamename: `Game Name: ${result.name}`,
+      price = `Current Price: $${current_price.toString()}`;
+      score = `Metacritic Score: ${result.metacritic.score}%`;
+      discount = `Discount ${disct_percentage}%`;
+    });
+
+    out = out+"<div class='game'><p>"+price+"</p><p>"+discount+"</p><p>"+score+"</p></div>";
   }
   return out + '</div>';
 });
@@ -135,7 +137,7 @@ app.get('/wishlist', (request, response) => {
     // Wishlist result
     // [ RowDataPacket { uid: 1, appid: 10 } ]
     response.render('wishlist.hbs', {
-      gamename: result
+      gamelist: result
     });
   });
 });
