@@ -110,15 +110,15 @@ app.get('/wishlist', (request, response) => {
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
     var input_pass = request.body.password
-    
+
     var resultName = 'numMatch';
-    
+
     var query = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
-    
+
     connection.query(query, function(err, result, fields) {
         if (err) throw err
 
-        
+
         if (result[0][resultName] != 1){
             response.render('index.hbs', {
                 logo: 'Steam_logo.png',
@@ -128,10 +128,10 @@ app.post('/loginAuth', (request, response) => {
         } else {
             response.render('loginSuccess.hbs')
         }
-        
+
     });
-    
-	
+
+
 });
 
 app.use( (request, response) => {
