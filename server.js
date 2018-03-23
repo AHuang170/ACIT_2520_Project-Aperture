@@ -24,8 +24,6 @@ var sql = 'SELECT * FROM users';
 
 connection.query(sql, function(err, rows, fields) {
   if (err) throw err
-
-  console.log(rows);
 });
 // -----------------------------------------------------------------------------
 
@@ -50,30 +48,24 @@ hbs.registerHelper('message', (text) => {
 })
 
 hbs.registerHelper('apps', (context, options) => {
-  var current_game = ''
-  var initial_price = 0;
-  var disct_price = 0;
-  var current_price = 0;
-  var price = '';
-  var score = 0;
-  var discount = 0;
   var out = "<div id='wishlist'>";
+  var items = [];
 
   for(var i=0, l=context.gamelist.length; i<l; i++) {
     current_game = context.gamelist[i].appid
 
-    steam(current_game).then((result) => {
-      initial_price = parseInt(result.price_overview.initial);
-      disct_percentage = parseInt(result.price_overview.discount_percent);
-      current_price =
-        (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-        // gamename: `Game Name: ${result.name}`,
-      price = `Current Price: $${current_price.toString()}`;
-      score = `Metacritic Score: ${result.metacritic.score}%`;
-      discount = `Discount ${disct_percentage}%`;
+    items = steam(current_game).then((result) => {
+      var initial_price = parseInt(result.price_overview.initial);
+      var disct_percentage = parseInt(result.price_overview.discount_percent);
+      var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+      var steam_name = `Game Name: ${result.name}`;
+      var steam_price = `Current Price: $${current_price.toString()}`;
+      var steam_discount = `Discount ${disct_percentage}%`;
+      console.log([steam_name, steam_price, steam_discount]);
+      return [steam_name, steam_price, steam_discount];
     });
 
-    out = out+"<div class='game'><p>"+price+"</p><p>"+discount+"</p><p>"+score+"</p></div>";
+    out = out+"<div class='game'><p>"+items[0]+"</p><p>"+items[1]+"</p><p>"+items[2]+"</p></div>";
   }
   return out + '</div>';
 });
@@ -134,8 +126,6 @@ app.get('/wishlist', (request, response) => {
 
   connection.query(query, function(err, result, fields) {
     if (err) throw err
-    // Wishlist result
-    // [ RowDataPacket { uid: 1, appid: 10 } ]
     response.render('wishlist.hbs', {
       gamelist: result
     });
@@ -145,14 +135,10 @@ app.get('/wishlist', (request, response) => {
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
     var input_pass = request.body.password
-
     var resultName = 'numMatch';
-
     var query = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
 
     connection.query(query, function(err, result, fields) {
-        // Result
-        //[ RowDataPacket { numMatch: 1 } ]
         if (err) throw err
         if (result[0][resultName] != 1){
             response.render('index.hbs', {
