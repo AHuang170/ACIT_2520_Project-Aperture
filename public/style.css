@@ -64,3 +64,21 @@ footer {
 	margin-bottom:-60px;
 	margin-left:-20px;
 }
+
+#loginForm{
+    position: absolute;
+    top: -30px;
+    right: -4px;
+    height: 30px;
+    
+}
+
+#failedText{
+    position: absolute;
+    height: 30px;
+    top: -20px;
+    left: 0px;
+    right: 0px;
+    margin: auto;
+    color: red;
+}
