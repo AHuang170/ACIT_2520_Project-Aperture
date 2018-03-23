@@ -54,14 +54,15 @@ hbs.registerHelper('apps', (context, options) => {
   for(var i=0, l=context.gamelist.length; i<l; i++) {
     current_game = context.gamelist[i].appid
 
-    steam(current_game).then((result) => {
+    var items = steam(current_game).then((result) => {
       var initial_price = parseInt(result.price_overview.initial);
       var disct_percentage = parseInt(result.price_overview.discount_percent);
       var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
       var steam_name = `Game Name: ${result.name}`;
       var steam_price = `Current Price: $${current_price.toString()}`;
       var steam_discount = `Discount ${disct_percentage}%`;
-      console.log(steam_name, steam_price, steam_discount);
+      return next(items);
+      // console.log(steam_name, steam_price, steam_discount);
     });
     // console.log(items.then);
 
