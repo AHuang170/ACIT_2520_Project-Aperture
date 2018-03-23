@@ -42,6 +42,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+// ----------------------------------- Helpers ---------------------------------
+
 hbs.registerHelper('getCurrentYear', () => {
 	return new Date().getFullYear();
 })
@@ -49,6 +51,16 @@ hbs.registerHelper('getCurrentYear', () => {
 hbs.registerHelper('message', (text) => {
 	return text.toUpperCase();
 })
+
+hbs.registerHelper('apps', (games, options) => {
+  var out = "<div id='wishlist'>";
+
+  for(var i=0, l=games.length; i<l; i++) {
+    out = out + "<div id='game'>" + options.fn(games[i]) + '</div>';
+  }
+
+  return out + '</div>';
+});
 
 // ----------------------------------- Routes ----------------------------------
 
@@ -103,7 +115,12 @@ app.post('/', (request, response) => {
 //});
 
 app.get('/wishlist', (request, response) => {
-  response.render('wishlist.hbs');
+
+  var testgames = [{gamename:'1'},{gamename:'2'}];
+
+  response.render('wishlist.hbs', {
+    apps: testgames,
+  });
 });
 
 //Login stuff....
