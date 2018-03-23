@@ -27,8 +27,6 @@ connection.query(sql, function(err, rows, fields) {
 
   console.log(rows);
 });
-
-// connection.end();
 // -----------------------------------------------------------------------------
 
 var gamelist = fs.readFileSync('games.json');
@@ -43,7 +41,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 // ----------------------------------- Helpers ---------------------------------
-
 hbs.registerHelper('getCurrentYear', () => {
 	return new Date().getFullYear();
 })
@@ -52,18 +49,34 @@ hbs.registerHelper('message', (text) => {
 	return text.toUpperCase();
 })
 
-hbs.registerHelper('apps', (games, options) => {
+hbs.registerHelper('apps', (context, options) => {
+
   var out = "<div id='wishlist'>";
+  for(var i=0, l=context.gamename.length; i<l; i++) {
 
-  for(var i=0, l=games.length; i<l; i++) {
-    out = out + "<div id='game'>" + options.fn(games[i]) + '</div>';
+    // steam(appid).then((result) => {
+    //
+    //   var initial_price = parseInt(result.price_overview.initial);
+    //   var disct_percentage = parseInt(result.price_overview.discount_percent);
+    //   var current_price =
+    //     (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+    //
+    //   response.render('index.hbs', {
+    //     logo: 'Steam_logo.png',
+    //     year: new Date().getFullYear(),
+    //             failedAuth: false,
+    //     gamename: `Game Name: ${result.name}`,
+    //     price: `Current Price: $${current_price.toString()}`,
+    //     score: `Metacritic Score: ${result.metacritic.score}%`,
+    //     discount: `Discount ${disct_percentage}%`
+    //   });
+
+    out = out + "<div id='game'>" + steam(context.gamename[i].appid) + '</div>';
   }
-
   return out + '</div>';
 });
 
 // ----------------------------------- Routes ----------------------------------
-
 app.get('/', (request, response) => {
 	response.render('index.hbs', {
 		logo: 'Steam_logo.png',
@@ -115,15 +128,18 @@ app.post('/', (request, response) => {
 //});
 
 app.get('/wishlist', (request, response) => {
+  var query = 'SELECT * FROM wishlist WHERE uid = 1';
 
-  var testgames = [{gamename:'1'},{gamename:'2'}];
-
-  response.render('wishlist.hbs', {
-    apps: testgames,
+  connection.query(query, function(err, result, fields) {
+    if (err) throw err
+    // Wishlist result
+    // [ RowDataPacket { uid: 1, appid: 10 } ]
+    response.render('wishlist.hbs', {
+      gamename: result
+    });
   });
 });
 
-//Login stuff....
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
     var input_pass = request.body.password
@@ -133,9 +149,9 @@ app.post('/loginAuth', (request, response) => {
     var query = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
 
     connection.query(query, function(err, result, fields) {
+        // Result
+        //[ RowDataPacket { numMatch: 1 } ]
         if (err) throw err
-
-
         if (result[0][resultName] != 1){
             response.render('index.hbs', {
                 logo: 'Steam_logo.png',
@@ -145,10 +161,7 @@ app.post('/loginAuth', (request, response) => {
         } else {
             response.render('loginSuccess.hbs')
         }
-
     });
-
-
 });
 
 app.use( (request, response) => {
