@@ -4,6 +4,7 @@ const hbs = require('hbs');
 const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
+const cookieSession = require('cookie-session')
 const serverPort = 8080;
 
 // --------------------------------- MySQL RDS ---------------------------------
@@ -36,6 +37,11 @@ app.set('view engine', 'hbs');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({
   extended: true
+}));
+app.use(cookieSession({
+  name: 'steamWisklistSession',
+  secret: 'uBE9Lz6pBC',
+  maxAge: 2 * 60 * 60 * 1000
 }));
 
 // ----------------------------------- Helpers ---------------------------------
@@ -76,6 +82,7 @@ app.get('/', (request, response) => {
 	response.render('index.hbs', {
 		logo: 'Steam_logo.png',
 		year: new Date().getFullYear(),
+        loggedIn: request.session.loggedIn,
         failedAuth: false
 	});
 });
@@ -98,7 +105,8 @@ app.post('/', (request, response) => {
 			response.render('index.hbs', {
 				logo: 'Steam_logo.png',
 				year: new Date().getFullYear(),
-                failedAuth: false,
+        failedAuth: false,
+        loggedIn: request.session.loggedIn,
 				gamename: `Game Name: ${result.name}`,
 				price: `Current Price: $${current_price.toString()}`,
 				score: `Metacritic Score: ${result.metacritic.score}%`,
@@ -111,6 +119,7 @@ app.post('/', (request, response) => {
 		response.render('index.hbs', {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
+      loggedIn: request.session.loggedIn,
 			error: 'Game not found'
 		});
 	}
@@ -142,13 +151,20 @@ app.post('/loginAuth', (request, response) => {
     connection.query(query, function(err, result, fields) {
         if (err) throw err
         if (result[0][resultName] != 1){
+          request.session.loggedIn = false;
             response.render('index.hbs', {
                 logo: 'Steam_logo.png',
-				year: new Date().getFullYear(),
+				        year: new Date().getFullYear(),
                 failedAuth: true,
+                loggedIn: request.session.loggedIn,
             });
         } else {
-            response.render('loginSuccess.hbs')
+          loggedIn: request.session.loggedIn = true;
+          response.render('index.hbs', {
+              logo: 'Steam_logo.png',
+              year: new Date().getFullYear(),
+              loggedIn: request.session.loggedIn,
+          });
         }
     });
 });

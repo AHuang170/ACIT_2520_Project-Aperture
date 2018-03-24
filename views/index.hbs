@@ -8,7 +8,12 @@
 	{{> header}}
 	<body>
 		<div id="container">
-            {{> login_form}}
+			{{#if loggedIn}}
+				{{> loggedin_message}}
+			{{else}}
+	    	{{> login_form}}
+			{{/if}}
+
 			<img id="logo" src={{logo}}>
 			<h1>Steam Wishlist</h1>
 

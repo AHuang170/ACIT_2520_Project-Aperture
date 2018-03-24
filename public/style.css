@@ -70,6 +70,14 @@ footer {
 
 }
 
+#welcomeMessage{
+	position:fixed;
+	top:20px;
+	right:20px;
+	height:30px;
+	text-align: right;
+}
+
 #failedText {
 	position:fixed;
 	top:2px;
