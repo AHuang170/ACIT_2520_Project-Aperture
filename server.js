@@ -25,6 +25,7 @@ var sql = 'SELECT * FROM users';
 
 connection.query(sql, function(err, rows, fields) {
   if (err) throw err
+  console.log(rows);
 });
 // -----------------------------------------------------------------------------
 
@@ -168,6 +169,53 @@ app.post('/loginAuth', (request, response) => {
     });
 });
 
+app.get('/accCreate', (request, response) => {
+  response.render('acc_create.hbs');
+});
+
+app.post('/createUser', (request, response) => {
+
+  var input_user_name = request.body.acc_name;
+  var input_user_pass = request.body.acc_pass;
+  var weak_pass = input_user_pass.length < 8;
+  var short_name = input_user_name < 6
+  var pass_space = input_user_pass.indexOf(" ") != -1;
+  var containsSpace = input_user_name.indexOf(" ") != -1;
+  var resultName = 'numName'
+
+  var alreadyExists = new Promise (function(resolve, reject){
+    var nameQuery = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_user_name}'`;
+    var queryResult = false;
+    connection.query(nameQuery, function(err, result, fields) {
+        if (err) throw err
+        if (result[0][resultName] != 0){
+          queryResult = true;
+
+        }
+        resolve(queryResult);
+    });
+  });
+
+  alreadyExists.then(function(duplicate){
+    if (duplicate || weak_pass || pass_space || short_name || containsSpace){
+      response.render('acc_create.hbs', {
+        shortName: short_name,
+        hasSpace: containsSpace,
+        duplicateName: duplicate,
+        weakPass: weak_pass,
+        spacePass: pass_space
+      });
+    } else {
+      var addQ = `INSERT INTO users (uid, username, password) VALUES (NULL, '${input_user_name}', '${input_user_pass}');`;
+      connection.query(addQ, function(err, result, fields) {
+          if (err) throw err
+          response.render('placeholder.hbs')
+      });
+    }
+  });
+
+})
+
 app.use( (request, response) => {
 	response.status(404);
 	response.render('404.hbs');
@@ -188,5 +236,4 @@ var steam = (game_id) => {
         	resolve(eval(test));
         });
     })
-
 };
