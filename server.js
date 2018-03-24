@@ -40,8 +40,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieSession({
   name: 'steamWisklistSession',
-  secret: 'uBE9Lz6pBC',
-  maxAge: 15 * 60 * 1000
+  secret: 'uBE9Lz6pBC'
 }));
 
 // ----------------------------------- Helpers ---------------------------------
