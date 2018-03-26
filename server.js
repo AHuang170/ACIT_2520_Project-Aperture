@@ -132,11 +132,16 @@ app.get('/wishlist', (request, response) => {
   connection.query(query, function(err, queryResult, fields) {
     if (err) throw err
     request.session.gameList = [];
-    games(queryResult).then((result) => {
-      response.render('wishlist.hbs', {
-        gamelist: result
-      });
-    });
+
+    getGames(queryResult)
+      .then(g => console.log(g))
+      .catch(err => console.log(err))
+
+    // const g = await games(queryResult).then((result) => {
+    //   response.render('wishlist.hbs', {
+    //     gamelist: result
+    //   });
+    // });
   });
 });
 
@@ -252,9 +257,7 @@ var steam = (game_id) => {
     })
 };
 
-
-
-var games = (queryResult) => {
+function games (queryResult) {
 
   return new Promise((resolve, reject) => {
     var returnList = [];
@@ -271,8 +274,12 @@ var games = (queryResult) => {
         // console.log([steam_name, steam_price, steam_discount]);
         return [steam_name, steam_price, steam_discount];
       }));
-
     }
     resolve(returnList);
   });
 };
+
+async function getGames (queryResult) {
+    const g = await games(queryResult)
+    return g;
+}
