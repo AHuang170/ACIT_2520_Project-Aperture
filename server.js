@@ -89,6 +89,9 @@ app.get('/', (request, response) => {
 		year: new Date().getFullYear(),
         loggedIn: request.session.loggedIn,
         failedAuth: false
+    loggedIn: request.session.loggedIn,
+    userName: request.session.userName,
+    failedAuth: false
 	});
 });
 
@@ -114,6 +117,7 @@ app.post('/', (request, response) => {
 				year: new Date().getFullYear(),
         failedAuth: false,
         loggedIn: request.session.loggedIn,
+        userName: request.session.userName,
 				gamename: `Game Name: ${result.name}`,
 				price: `Current Price: ${current_price}`,
 				// score: `Metacritic Score: ${result.metacritic.score}%`,
@@ -135,7 +139,12 @@ app.post('/', (request, response) => {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
+<<<<<<< HEAD
 			error: gameList
+=======
+      userName: request.session.userName,
+			error: 'Game not found'
+>>>>>>> 18ffb09340d1526281ef669d8d3bbf79fbfffad0
 		});
 	}
 });
@@ -174,15 +183,73 @@ app.post('/loginAuth', (request, response) => {
                 loggedIn: request.session.loggedIn,
             });
         } else {
-          loggedIn: request.session.loggedIn = true;
+          // loggedIn: request.session.loggedIn = true;
+          request.session.loggedIn = true;
+          request.session.userName = input_name;
           response.render('index.hbs', {
               logo: 'Steam_logo.png',
               year: new Date().getFullYear(),
               loggedIn: request.session.loggedIn,
+              userName: request.session.userName
           });
         }
     });
 });
+
+app.get('/logout', (request, response) => {
+  request.session = null;
+  response.render('index.hbs', {
+		logo: 'Steam_logo.png',
+		year: new Date().getFullYear(),
+	});
+});
+
+app.get('/accCreate', (request, response) => {
+  response.render('acc_create.hbs');
+});
+
+app.post('/createUser', (request, response) => {
+
+  var input_user_name = request.body.acc_name;
+  var input_user_pass = request.body.acc_pass;
+  var weak_pass = input_user_pass.length < 8;
+  var short_name = input_user_name < 6
+  var pass_space = input_user_pass.indexOf(" ") != -1;
+  var containsSpace = input_user_name.indexOf(" ") != -1;
+  var resultName = 'numName'
+
+  var alreadyExists = new Promise (function(resolve, reject){
+    var nameQuery = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_user_name}'`;
+    var queryResult = false;
+    connection.query(nameQuery, function(err, result, fields) {
+        if (err) throw err
+        if (result[0][resultName] != 0){
+          queryResult = true;
+
+        }
+        resolve(queryResult);
+    });
+  });
+
+  alreadyExists.then(function(duplicate){
+    if (duplicate || weak_pass || pass_space || short_name || containsSpace){
+      response.render('acc_create.hbs', {
+        shortName: short_name,
+        hasSpace: containsSpace,
+        duplicateName: duplicate,
+        weakPass: weak_pass,
+        spacePass: pass_space
+      });
+    } else {
+      var addQ = `INSERT INTO users (uid, username, password) VALUES (NULL, '${input_user_name}', '${input_user_pass}');`;
+      connection.query(addQ, function(err, result, fields) {
+          if (err) throw err
+          response.render('placeholder.hbs')
+      });
+    }
+  });
+
+})
 
 app.use( (request, response) => {
 	response.status(404);
@@ -204,5 +271,4 @@ var steam = (game_id) => {
         	resolve(eval(test));
         });
     })
-
 };
