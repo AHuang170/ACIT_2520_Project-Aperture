@@ -4,7 +4,10 @@ const hbs = require('hbs');
 const fs = require('fs');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
+const subsearch = require('subsequence-search');
+// const handle = require('handlebars');
+
 const serverPort = 8080;
 
 // --------------------------------- MySQL RDS ---------------------------------
@@ -30,6 +33,9 @@ connection.query(sql, function(err, rows, fields) {
 
 var gamelist = fs.readFileSync('games.json');
 var gameobj = JSON.parse(gamelist);
+var dataList = {};
+dataList['data'] = gameobj.applist.apps;
+dataList['searchInProps'] = ['name'];
 
 var app = express();
 hbs.registerPartials(__dirname + '/views/partials');
@@ -95,31 +101,41 @@ app.post('/', (request, response) => {
 		var appid = gameobj['applist'].apps[index].appid.toString();
 
 		steam(appid).then((result) => {
-
-			var initial_price = parseInt(result.price_overview.initial);
-			var disct_percentage = parseInt(result.price_overview.discount_percent);
-			var current_price =
-        (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-
+      if(result.is_free == true){
+        var current_price = 'Free';
+      }else {
+        var initial_price = parseInt(result.price_overview.initial);
+  			var disct_percentage = parseInt(result.price_overview.discount_percent);
+  			var current_price = '$'+
+          (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
+      }
 			response.render('index.hbs', {
 				logo: 'Steam_logo.png',
 				year: new Date().getFullYear(),
         failedAuth: false,
         loggedIn: request.session.loggedIn,
 				gamename: `Game Name: ${result.name}`,
-				price: `Current Price: $${current_price.toString()}`,
-				score: `Metacritic Score: ${result.metacritic.score}%`,
+				price: `Current Price: ${current_price}`,
+				// score: `Metacritic Score: ${result.metacritic.score}%`,
 				discount: `Discount ${disct_percentage}%`
 			});
 		}).catch((error)=>{
-
+        console.log(error);
 		});
 	} else {
+    var result = subsearch.search({
+      rank: subsearch.transforms.rank('name'),
+      noHighlight: subsearch.transforms.noHighlight,
+    }, dataList, request.body.game);
+    var gameList ='';
+    for(i=0;i<10;i++){
+      gameList += `${result.data[i].name} `;
+    }
 		response.render('index.hbs', {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
-			error: 'Game not found'
+			error: gameList
 		});
 	}
 });
