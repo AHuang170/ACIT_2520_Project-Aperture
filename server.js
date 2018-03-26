@@ -59,6 +59,7 @@ hbs.registerHelper('message', (text) => {
 })
 
 hbs.registerHelper('apps', (context, options) => {
+
   var out = "<div id='wishlist'>";
   var items = [];
 
@@ -137,12 +138,7 @@ app.post('/', (request, response) => {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
-// <<<<<<< HEAD
 			error: gameList
-// =======
-//       userName: request.session.userName,
-// 			// error: 'Game not found'
-// >>>>>>> 18ffb09340d1526281ef669d8d3bbf79fbfffad0
 		});
 	}
 });
@@ -246,10 +242,9 @@ app.post('/createUser', (request, response) => {
       });
     }
   });
-
 })
 
-app.use( (request, response) => {
+app.use((request, response) => {
 	response.status(404);
 	response.render('404.hbs');
 });
