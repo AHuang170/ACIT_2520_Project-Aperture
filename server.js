@@ -82,8 +82,9 @@ app.get('/', (request, response) => {
 	response.render('index.hbs', {
 		logo: 'Steam_logo.png',
 		year: new Date().getFullYear(),
-        loggedIn: request.session.loggedIn,
-        failedAuth: false
+    loggedIn: request.session.loggedIn,
+    userName: request.session.userName,
+    failedAuth: false
 	});
 });
 
@@ -107,6 +108,7 @@ app.post('/', (request, response) => {
 				year: new Date().getFullYear(),
         failedAuth: false,
         loggedIn: request.session.loggedIn,
+        userName: request.session.userName,
 				gamename: `Game Name: ${result.name}`,
 				price: `Current Price: $${current_price.toString()}`,
 				score: `Metacritic Score: ${result.metacritic.score}%`,
@@ -120,6 +122,7 @@ app.post('/', (request, response) => {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
+      userName: request.session.userName,
 			error: 'Game not found'
 		});
 	}
@@ -159,14 +162,25 @@ app.post('/loginAuth', (request, response) => {
                 loggedIn: request.session.loggedIn,
             });
         } else {
-          loggedIn: request.session.loggedIn = true;
+          // loggedIn: request.session.loggedIn = true;
+          request.session.loggedIn = true;
+          request.session.userName = input_name;
           response.render('index.hbs', {
               logo: 'Steam_logo.png',
               year: new Date().getFullYear(),
               loggedIn: request.session.loggedIn,
+              userName: request.session.userName
           });
         }
     });
+});
+
+app.get('/logout', (request, response) => {
+  request.session = null;
+  response.render('index.hbs', {
+		logo: 'Steam_logo.png',
+		year: new Date().getFullYear(),
+	});
 });
 
 app.get('/accCreate', (request, response) => {
