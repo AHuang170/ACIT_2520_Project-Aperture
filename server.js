@@ -87,8 +87,6 @@ app.get('/', (request, response) => {
 	response.render('index.hbs', {
 		logo: 'Steam_logo.png',
 		year: new Date().getFullYear(),
-        loggedIn: request.session.loggedIn,
-        failedAuth: false
     loggedIn: request.session.loggedIn,
     userName: request.session.userName,
     failedAuth: false
@@ -139,12 +137,12 @@ app.post('/', (request, response) => {
 			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
-<<<<<<< HEAD
+// <<<<<<< HEAD
 			error: gameList
-=======
-      userName: request.session.userName,
-			error: 'Game not found'
->>>>>>> 18ffb09340d1526281ef669d8d3bbf79fbfffad0
+// =======
+//       userName: request.session.userName,
+// 			// error: 'Game not found'
+// >>>>>>> 18ffb09340d1526281ef669d8d3bbf79fbfffad0
 		});
 	}
 });
