@@ -6,8 +6,6 @@ const _ = require('lodash');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const subsearch = require('subsequence-search');
-// const handle = require('handlebars');
-
 const serverPort = 8080;
 
 // --------------------------------- MySQL RDS ---------------------------------
@@ -58,27 +56,12 @@ hbs.registerHelper('message', (text) => {
 	return text.toUpperCase();
 })
 
-hbs.registerHelper('apps', (context, options) => {
-
+// Expects a list of lists with the following format:
+// [ ['Game Name: OneShot', 'Current Price: $10.99', 'Discount 15%'], [...] ]
+hbs.registerHelper('apps', (list) => {
   var out = "<div id='wishlist'>";
-  var items = [];
-
-  for(var i=0, l=context.gamelist.length; i<l; i++) {
-    current_game = context.gamelist[i].appid
-
-    var items = steam(current_game).then((result) => {
-      var initial_price = parseInt(result.price_overview.initial);
-      var disct_percentage = parseInt(result.price_overview.discount_percent);
-      var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-      var steam_name = `Game Name: ${result.name}`;
-      var steam_price = `Current Price: $${current_price.toString()}`;
-      var steam_discount = `Discount ${disct_percentage}%`;
-      return next(items);
-      // console.log(steam_name, steam_price, steam_discount);
-    });
-    // console.log(items.then);
-
-    out = out+"<div class='game'><p>"+items[0]+"</p><p>"+items[1]+"</p><p>"+items[2]+"</p></div>";
+  for (var item in list) {
+    out = out+"<div class='game'><p>"+list[0]+"</p><p>"+list[1]+"</p><p>"+list[2]+"</p></div>";
   }
   return out + '</div>';
 });
@@ -105,7 +88,7 @@ app.post('/', (request, response) => {
 		steam(appid).then((result) => {
       if(result.is_free == true){
         var current_price = 'Free';
-      }else {
+      } else {
         var initial_price = parseInt(result.price_overview.initial);
   			var disct_percentage = parseInt(result.price_overview.discount_percent);
   			var current_price = '$'+
@@ -131,7 +114,7 @@ app.post('/', (request, response) => {
       noHighlight: subsearch.transforms.noHighlight,
     }, dataList, request.body.game);
     var gameList ='';
-    for(i=0;i<10;i++){
+    for(i=0; i<10; i++) {
       gameList += `${result.data[i].name} `;
     }
 		response.render('index.hbs', {
@@ -152,10 +135,12 @@ app.post('/', (request, response) => {
 app.get('/wishlist', (request, response) => {
   var query = 'SELECT * FROM wishlist WHERE uid = 1';
 
-  connection.query(query, function(err, result, fields) {
+  connection.query(query, function(err, queryResult, fields) {
     if (err) throw err
-    response.render('wishlist.hbs', {
-      gamelist: result
+    var gamesForUser = games(queryResult).then((result) => {
+      response.render('wishlist.hbs', {
+        gamelist: result
+      });
     });
   });
 });
@@ -264,4 +249,25 @@ var steam = (game_id) => {
         	resolve(eval(test));
         });
     })
+};
+
+var games = (queryResult) => {
+  return new Promise((resolve, reject) => {
+    var returnList = [];
+
+    for(var i=0, l=queryResult.gamelist.length; i<l; i++) {
+      current_game = queryResult.gamelist[i].appid
+
+      returnList.push(steam(current_game).then((result) => {
+        var initial_price = parseInt(result.price_overview.initial);
+        var disct_percentage = parseInt(result.price_overview.discount_percent);
+        var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+        var steam_name = `Game Name: ${result.name}`;
+        var steam_price = `Current Price: $${current_price.toString()}`;
+        var steam_discount = `Discount ${disct_percentage}%`;
+        return [steam_name, steam_price, steam_discount];
+      }));
+      console.log(returnList);
+    }
+  });
 };
