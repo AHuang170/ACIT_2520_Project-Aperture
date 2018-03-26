@@ -134,7 +134,7 @@ app.get('/wishlist', (request, response) => {
     request.session.gameList = [];
 
     getGames(queryResult)
-      .then(g => console.log(g))
+      .then(g => console.log('1'))
       .catch(err => console.log(err))
 
     // const g = await games(queryResult).then((result) => {
@@ -275,6 +275,7 @@ function games (queryResult) {
         return [steam_name, steam_price, steam_discount];
       }));
     }
+    console.log(returnList);
     resolve(returnList);
   });
 };
