@@ -126,24 +126,25 @@ app.post('/', (request, response) => {
 	}
 });
 
-//app.get('/login', (request, response) => {
-//	response.render('login.hbs', {
-//        failedAuth: false
-//    });
-//});
-
 app.get('/wishlist', (request, response) => {
   var query = 'SELECT * FROM wishlist WHERE uid = 1';
 
   connection.query(query, function(err, queryResult, fields) {
     if (err) throw err
-    var gamesForUser = games(queryResult).then((result) => {
+    request.session.gameList = [];
+    games(queryResult).then((result) => {
       response.render('wishlist.hbs', {
         gamelist: result
       });
     });
   });
 });
+
+//app.get('/login', (request, response) => {
+//	response.render('login.hbs', {
+//        failedAuth: false
+//    });
+//});
 
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
@@ -251,13 +252,15 @@ var steam = (game_id) => {
     })
 };
 
+
+
 var games = (queryResult) => {
+
   return new Promise((resolve, reject) => {
     var returnList = [];
 
-    for(var i=0, l=queryResult.gamelist.length; i<l; i++) {
-      current_game = queryResult.gamelist[i].appid
-
+    for(var i=0, l=queryResult.length; i<l; i++) {
+      current_game = queryResult[i].appid
       returnList.push(steam(current_game).then((result) => {
         var initial_price = parseInt(result.price_overview.initial);
         var disct_percentage = parseInt(result.price_overview.discount_percent);
@@ -265,9 +268,11 @@ var games = (queryResult) => {
         var steam_name = `Game Name: ${result.name}`;
         var steam_price = `Current Price: $${current_price.toString()}`;
         var steam_discount = `Discount ${disct_percentage}%`;
+        // console.log([steam_name, steam_price, steam_discount]);
         return [steam_name, steam_price, steam_discount];
       }));
-      console.log(returnList);
+
     }
+    resolve(returnList);
   });
 };
