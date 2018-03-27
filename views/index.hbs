@@ -7,22 +7,12 @@
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body>
-		<div id="container">
-			{{> header}}
-			{{#if loggedIn}}
-				{{> loggedin_message}}
-			{{else}}
-	    	{{> login_form}}
-			{{/if}}
-			{{> search}}
-			{{> details}}
-			{{> wishlist}}
+		{{> header}}
+			<div class="wrapper">
+				{{> search}}
+				{{> details}}
+				{{> wishlist}}
+			</div>
 			<br>
-			<p>{{gamename}}</p>
-			<p>{{price}}</p>
-			<p>{{discount}}</p>
-			<p>{{score}}</p>
-			<p>{{error}}</p>
-		</div>
 	</body>
 </html>

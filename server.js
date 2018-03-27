@@ -70,12 +70,37 @@ hbs.registerHelper('apps', (list) => {
 
 // ----------------------------------- Routes ----------------------------------
 app.get('/', (request, response) => {
-	response.render('index.hbs', {
-		year: new Date().getFullYear(),
-    loggedIn: request.session.loggedIn,
-    userName: request.session.userName,
-    failedAuth: false
-	});
+  var query = 'SELECT * FROM wishlist WHERE uid = 1';
+  connection.query(query, function(err, queryResult, fields){
+    var returnList = [];
+    (async function game_loop(){
+      for (const item of queryResult){
+        var steam_result = await steam(item.appid);
+        var initial_price = parseInt(steam_result.price_overview.initial);
+        var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
+        var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+        var steam_name = `Game Name: ${steam_result.name}`;
+        var steam_price = `Current Price: $${current_price.toString()}`;
+        var steam_discount = `Discount ${disct_percentage}%`;
+        returnList.push([steam_name, steam_price, steam_discount]);
+      }
+      request.session.wishlist = returnList;
+      // console.log
+      response.render('index.hbs', {
+        gameList: request.session.wishlist,
+        year: new Date().getFullYear(),
+        loggedIn: request.session.loggedIn,
+        userName: request.session.userName,
+        failedAuth: false
+      });
+    })();
+  });
+	// response.render('index.hbs', {
+	// 	year: new Date().getFullYear(),
+  //   loggedIn: request.session.loggedIn,
+  //   userName: request.session.userName,
+  //   failedAuth: false
+	// });
 });
 
 app.post('/', (request, response) => {
@@ -96,6 +121,7 @@ app.post('/', (request, response) => {
           (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
       }
 			response.render('index.hbs', {
+        gameList: request.session.wishlist,
 				year: new Date().getFullYear(),
         failedAuth: false,
         loggedIn: request.session.loggedIn,
@@ -125,28 +151,28 @@ app.post('/', (request, response) => {
 	}
 });
 
-app.get('/wishlist', (request, response) => {
-  var query = 'SELECT * FROM wishlist WHERE uid = 1';
-  connection.query(query, function(err, queryResult, fields){
-    var returnList = [];
-    (async function game_loop(){
-      for (const item of queryResult){
-        var steam_result = await steam(item.appid);
-        var initial_price = parseInt(steam_result.price_overview.initial);
-        var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
-        var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-        var steam_name = `Game Name: ${steam_result.name}`;
-        var steam_price = `Current Price: $${current_price.toString()}`;
-        var steam_discount = `Discount ${disct_percentage}%`;
-        returnList.push([steam_name, steam_price, steam_discount]);
-      }
-      // console.log
-      response.render('wishlist.hbs', {
-        gameList: returnList
-      });
-    })();
-  });
-});
+// app.get('/wishlist', (request, response) => {
+//   var query = 'SELECT * FROM wishlist WHERE uid = 1';
+//   connection.query(query, function(err, queryResult, fields){
+//     var returnList = [];
+//     (async function game_loop(){
+//       for (const item of queryResult){
+//         var steam_result = await steam(item.appid);
+//         var initial_price = parseInt(steam_result.price_overview.initial);
+//         var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
+//         var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+//         var steam_name = `Game Name: ${steam_result.name}`;
+//         var steam_price = `Current Price: $${current_price.toString()}`;
+//         var steam_discount = `Discount ${disct_percentage}%`;
+//         returnList.push([steam_name, steam_price, steam_discount]);
+//       }
+//       // console.log
+//       response.render('wishlist.hbs', {
+//         gameList: returnList
+//       });
+//     })();
+//   });
+// });
 
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
