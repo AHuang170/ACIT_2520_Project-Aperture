@@ -127,22 +127,29 @@ app.post('/', (request, response) => {
 });
 
 app.get('/wishlist', (request, response) => {
-  var query = 'SELECT * FROM wishlist WHERE uid = 1';
 
-  connection.query(query, function(err, queryResult, fields) {
-    if (err) throw err
-    request.session.gameList = [];
+  getGames()
 
-    getGames(queryResult)
-      .then(g => console.log('1'))
-      .catch(err => console.log(err))
+  async function getGames() {
 
-    // const g = await games(queryResult).then((result) => {
-    //   response.render('wishlist.hbs', {
-    //     gamelist: result
-    //   });
-    // });
-  });
+    var query = 'SELECT * FROM wishlist WHERE uid = 1';
+    var res = await connection.query(query, function(err, queryResult, fields) {
+      if (err) throw err
+    });
+
+    var returnList = [];
+    var newList = []
+
+    for (const item of res.queryResult) {
+      var s = await steam(item.appid);
+      returnList.push(s.name);
+    }
+
+    newList.push(returnList);
+    response.render('wishlist.hbs', {
+      gamelist: newList
+    });
+  }
 });
 
 //app.get('/login', (request, response) => {
@@ -257,30 +264,25 @@ var steam = (game_id) => {
     })
 };
 
-function games (queryResult) {
-
-  return new Promise((resolve, reject) => {
-    var returnList = [];
-
-    for(var i=0, l=queryResult.length; i<l; i++) {
-      current_game = queryResult[i].appid
-      returnList.push(steam(current_game).then((result) => {
-        var initial_price = parseInt(result.price_overview.initial);
-        var disct_percentage = parseInt(result.price_overview.discount_percent);
-        var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-        var steam_name = `Game Name: ${result.name}`;
-        var steam_price = `Current Price: $${current_price.toString()}`;
-        var steam_discount = `Discount ${disct_percentage}%`;
-        // console.log([steam_name, steam_price, steam_discount]);
-        return [steam_name, steam_price, steam_discount];
-      }));
-    }
-    console.log(returnList);
-    resolve(returnList);
-  });
-};
-
-async function getGames (queryResult) {
-    const g = await games(queryResult)
-    return g;
-}
+// function games (queryResult) {
+//
+//   return new Promise((resolve, reject) => {
+//     var returnList = [];
+//
+//     for(var i=0, l=queryResult.length; i<l; i++) {
+//       current_game = queryResult[i].appid
+//       returnList.push(steam(current_game).then((result) => {
+//         var initial_price = parseInt(result.price_overview.initial);
+//         var disct_percentage = parseInt(result.price_overview.discount_percent);
+//         var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+//         var steam_name = `Game Name: ${result.name}`;
+//         var steam_price = `Current Price: $${current_price.toString()}`;
+//         var steam_discount = `Discount ${disct_percentage}%`;
+//         // console.log([steam_name, steam_price, steam_discount]);
+//         return [steam_name, steam_price, steam_discount];
+//       }));
+//     }
+//     console.log(returnList);
+//     resolve(returnList);
+//   });
+// };
