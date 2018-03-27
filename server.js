@@ -59,9 +59,11 @@ hbs.registerHelper('message', (text) => {
 // Expects a list of lists with the following format:
 // [ ['Game Name: OneShot', 'Current Price: $10.99', 'Discount 15%'], [...] ]
 hbs.registerHelper('apps', (list) => {
+  var titleList = list.gameList;
   var out = "<div id='wishlist'>";
-  for (var item in list) {
-    out = out+"<div class='game'><p>"+list[0]+"</p><p>"+list[1]+"</p><p>"+list[2]+"</p></div>";
+  for (var item in titleList) {
+    //out = out+"<div class='game'><p>"+list[0]+"</p><p>"+list[1]+"</p><p>"+list[2]+"</p></div>";
+    out = out+"<div class='game'><p>"+ titleList[item] +"</p></div>";
   }
   return out + '</div>';
 });
@@ -127,29 +129,56 @@ app.post('/', (request, response) => {
 });
 
 app.get('/wishlist', (request, response) => {
-
-  getGames()
-
-  async function getGames() {
-
-    var query = 'SELECT * FROM wishlist WHERE uid = 1';
-    var res = await connection.query(query, function(err, queryResult, fields) {
-      if (err) throw err
-    });
-
+  var query = 'SELECT * FROM wishlist WHERE uid = 1';
+  connection.query(query, function(err, queryResult, fields){
     var returnList = [];
-    var newList = []
+    var newList = [];
 
-    for (const item of res.queryResult) {
-      var s = await steam(item.appid);
-      returnList.push(s.name);
-    }
+    (async function game_loop(){
+      for (const item of queryResult){
+        var steam_result = await steam(item.appid);
+        returnList.push(steam_result.name);
+      }
 
-    newList.push(returnList);
-    response.render('wishlist.hbs', {
-      gamelist: newList
-    });
-  }
+      //newList.push(returnList);
+      response.render('wishlist.hbs', {
+        gameList: returnList
+      });
+
+    })();
+
+    // for (const item of queryResult){
+    //   steam(item.appid).then(function(result) {
+    //     returnList.push(result.name);
+    //     console.log(result.name);
+    //   }, function(err){
+    //     console.log('ERROR');
+    //   });
+    // }
+
+  });
+
+  // getGames();
+  //
+  // async function getGames() {
+  //
+  //   var query = 'SELECT * FROM wishlist WHERE uid = 1';
+  //   var res = await connection.query(query, function(err, queryResult, fields) {
+  //     if (err) throw err
+  //   });
+  //
+  //   var returnList = [];
+  //   var newList = []
+  //   for (const item of res.queryResult) {
+  //     var s = await steam(item.appid);
+  //     returnList.push(s.name);
+  //   }
+  //
+  //   newList.push(returnList);
+  //   response.render('wishlist.hbs', {
+  //     gamelist: newList
+  //   });
+  // }
 });
 
 //app.get('/login', (request, response) => {
@@ -251,18 +280,30 @@ app.listen(8080, () => {
     console.log(`Server is up on the port ${serverPort}`);
 });
 
-var steam = (game_id) => {
-    return new Promise((resolve, reject) => {
-        request({
-            url: 'http://store.steampowered.com/api/appdetails?appids='
-                  + game_id,
-            json: true
-        }, (error, response, body) => {
-        	var test = `body[${game_id}].data`;
-        	resolve(eval(test));
-        });
-    })
-};
+// var steam = (game_id) => {
+//     return new Promise((resolve, reject) => {
+//         request({
+//             url: 'http://store.steampowered.com/api/appdetails?appids='
+//                   + game_id,
+//             json: true
+//         }, (error, response, body) => {
+//         	var test = `body[${game_id}].data`;
+//         	resolve(eval(test));
+//         });
+//     })
+// };
+
+function steam(game_id){
+  return new Promise((resolve, reject) => {
+    request({
+      url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
+      json: true
+    }, (error, response, body) => {
+      var test = `body[${game_id}].data`;
+      resolve(eval(test));
+    });
+  });
+}
 
 // function games (queryResult) {
 //
