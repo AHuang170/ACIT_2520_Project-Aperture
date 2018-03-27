@@ -30,7 +30,11 @@ h2 {
 }
 
 header {
-	text-align:center;
+	position:relative;
+	width:100%;
+	height:70px;
+	background-color:rgb(240,240,240);
+	line-height:70px;
 }
 
 footer {
@@ -56,10 +60,12 @@ footer {
 }
 
 #logo {
-	position:relative;
-	width:200px;
-	margin-bottom:-60px;
-	margin-left:-20px;
+	position:absolute;
+	left:5px;
+	top:0px;
+	bottom:0px;
+	width:60px;
+	margin:auto;
 }
 
 #loginForm {
@@ -91,8 +97,25 @@ footer {
 	height:100%;
 }
 
+#title {
+	position:absolute;
+	text-align:left;
+	left:100px;
+	right:0px;
+	top:0px;
+	bottom:0px;
+	margin:auto;
+	font-size:2.7em;
+	height:100%;
+	vertical-align:middle;
+}
+
 .game {
 	position:relative;
 	width:100%;
 	height:20%;
+}
+
+.shadow {
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }

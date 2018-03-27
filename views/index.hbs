@@ -3,7 +3,7 @@
 	<head>
 		<title>Home</title>
 		<link href="css/bootstrap.min.css" rel="stylesheet">
-		<link rel="stylesheet" href="style.css"></link>
+		<link rel="stylesheet" href="css/style.css"></link>
 		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
 	</head>
 	{{> header}}
@@ -14,15 +14,10 @@
 			{{else}}
 	    	{{> login_form}}
 			{{/if}}
-
-			<img id="logo" src={{logo}}>
-			<h1>Steam Wishlist</h1>
-
-			<h3>Add Game</h3>
 			<form action="/" method="post"><div class="form-group">
 				<label for="game">Enter Game Name: </label>
 				<input class="form-control" type="text" name="game">
-				<input class="btn btn-primary" type="submit" value="OK">
+				<input class="btn btn-primary" type="submit" value="Search Game">
 			</div></form>
 			<br>
 			<p>{{gamename}}</p>

@@ -198,7 +198,7 @@ app.post('/createUser', (request, response) => {
   var input_user_name = request.body.acc_name;
   var input_user_pass = request.body.acc_pass;
   var weak_pass = input_user_pass.length < 8;
-  var short_name = input_user_name < 6
+  var short_name = input_user_name.length < 6
   var pass_space = input_user_pass.indexOf(" ") != -1;
   var containsSpace = input_user_name.indexOf(" ") != -1;
   var resultName = 'numName'
