@@ -2,9 +2,9 @@
 <html>
 	<head>
 		<title>Home</title>
-		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="css/style.css"></link>
 		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	{{> header}}
 	<body>
@@ -14,11 +14,9 @@
 			{{else}}
 	    	{{> login_form}}
 			{{/if}}
-			<form action="/" method="post"><div class="form-group">
-				<label for="game">Enter Game Name: </label>
-				<input class="form-control" type="text" name="game">
-				<input class="btn btn-primary" type="submit" value="Search Game">
-			</div></form>
+			{{> search}}
+			{{> details}}
+			{{> wishlist}}
 			<br>
 			<p>{{gamename}}</p>
 			<p>{{price}}</p>
@@ -26,8 +24,5 @@
 			<p>{{score}}</p>
 			<p>{{error}}</p>
 		</div>
-
 	</body>
-
-	{{> footer}}
 </html>

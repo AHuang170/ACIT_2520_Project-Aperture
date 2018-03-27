@@ -71,7 +71,6 @@ hbs.registerHelper('apps', (list) => {
 // ----------------------------------- Routes ----------------------------------
 app.get('/', (request, response) => {
 	response.render('index.hbs', {
-		logo: 'Steam_logo.png',
 		year: new Date().getFullYear(),
     loggedIn: request.session.loggedIn,
     userName: request.session.userName,
@@ -97,7 +96,6 @@ app.post('/', (request, response) => {
           (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
       }
 			response.render('index.hbs', {
-				logo: 'Steam_logo.png',
 				year: new Date().getFullYear(),
         failedAuth: false,
         loggedIn: request.session.loggedIn,
@@ -120,7 +118,6 @@ app.post('/', (request, response) => {
       gameList += `${result.data[i].name} `;
     }
 		response.render('index.hbs', {
-			logo: 'Steam_logo.png',
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
 			error: gameList
@@ -162,7 +159,6 @@ app.post('/loginAuth', (request, response) => {
         if (result[0][resultName] != 1){
           request.session.loggedIn = false;
             response.render('index.hbs', {
-                logo: 'Steam_logo.png',
 				        year: new Date().getFullYear(),
                 failedAuth: true,
                 loggedIn: request.session.loggedIn,
@@ -172,7 +168,6 @@ app.post('/loginAuth', (request, response) => {
           request.session.loggedIn = true;
           request.session.userName = input_name;
           response.render('index.hbs', {
-              logo: 'Steam_logo.png',
               year: new Date().getFullYear(),
               loggedIn: request.session.loggedIn,
               userName: request.session.userName
@@ -184,7 +179,6 @@ app.post('/loginAuth', (request, response) => {
 app.get('/logout', (request, response) => {
   request.session = null;
   response.render('index.hbs', {
-		logo: 'Steam_logo.png',
 		year: new Date().getFullYear(),
 	});
 });

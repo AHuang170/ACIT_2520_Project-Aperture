@@ -2,12 +2,15 @@
     {{#if failedAuth}}
     <div id="failedText">Invalid username or password</div>
     {{/if}}
-    <form action="/loginAuth" method="post">
-        <label for="username">Username: </label>
-        <input type="text" name="username">
-        <label for="password">Password: </label>
-        <input type="password" name="password">
-        <input type="submit" value="LOGIN">
-    </form>
+
+    <div class="form-group">
+      <form action="/loginAuth" method="post">
+          <label for="username">Username: </label>
+          <input id="username" class="form-control" type="text" name="username">
+          <label for="password">Password: </label>
+          <input id="password" class="form-control" type="password" name="password">
+          <input class="btn btn-primary" type="submit" value="LOGIN">
+      </form>
+    </div>
     <a href="/accCreate">Create new account</a>
 </div>
