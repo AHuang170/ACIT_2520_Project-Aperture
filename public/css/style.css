@@ -1,10 +1,4 @@
-/*
-style.css
-
-Challenge 8
-
-Robert Janzen - A01029341 2B
-*/
+/* ---------------------------------- Body ---------------------------------- */
 
 body {
 	font-family: 'Lato', sans-serif;
@@ -29,25 +23,6 @@ h2 {
 	font-size:2.5em;
 }
 
-header {
-	position:relative;
-	width:100%;
-	height:70px;
-	background-color:rgb(240,240,240);
-	line-height:70px;
-	z-index:6;
-}
-
-footer {
-	position:absolute;
-	text-align:center;
-	left:0px;
-	right:0px;
-	bottom:20px;
-	margin:auto;
-	z-index:5;
-}
-
 #container {
 	text-align:left;
 	position:absolute;
@@ -59,6 +34,20 @@ footer {
 	width:100vw;
 	height:100vh;
 	background-color:rgb(250,250,250);
+}
+
+.shadow {
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+/* --------------------------------- Header --------------------------------- */
+header {
+	position:relative;
+	width:100%;
+	height:70px;
+	background-color:rgb(240,240,240);
+	line-height:70px;
+	z-index:6;
 }
 
 #logo {
@@ -82,6 +71,32 @@ footer {
 	padding:18px;
 }
 
+#title {
+	position:absolute;
+	text-align:left;
+	left:100px;
+	right:0px;
+	top:0px;
+	bottom:0px;
+	margin:auto;
+	font-size:2.7em;
+	height:100%;
+	vertical-align:middle;
+	z-index:2;
+}
+
+#username {
+	position:relative;
+	width:35%;
+	display:inline-block;
+}
+
+#password {
+	position:relative;
+	width:35%;
+	display:inline-block;
+}
+
 #welcomeMessage{
 	position:fixed;
 	top:20px;
@@ -99,65 +114,34 @@ footer {
 	z-index:8;
 }
 
-#wishlist {
-	position:absolute;
-	right:10px;
-	bottom:10px;
-	height:88.2%;
-	width:49%;
-	margin:auto;
-	padding:15px;
-	z-index:10;
-	background-color:rgb(255,255,255);
-}
-
-#title {
-	position:absolute;
-	text-align:left;
-	left:100px;
-	right:0px;
-	top:0px;
-	bottom:0px;
-	margin:auto;
-	font-size:2.7em;
-	height:100%;
-	vertical-align:middle;
-	z-index:2;
-}
-
+/* --------------------------------- Search --------------------------------- */
 #search {
-	position:absolute;
+	position:relative;
+	display:inline-block;
 	left:10px;
-	top:100px;
-	width:49%;
-	margin:auto;
+	top:20px;
+	width:47%;
+	height:16%;
 	padding:15px;
 	z-index:3;
 	background-color:rgb(255,255,255);
 }
 
+#search-btn {
+	margin-top:20px;
+}
+
+/* --------------------------------- Details -------------------------------- */
 #details {
-	position:absolute;
+	position:relative;
+	display:inline-block;
 	left:10px;
 	bottom:10px;
 	height:70%;
-	margin:auto;
 	padding:15px;
-	width:49%;
+	width:47%;
 	z-index:4;
 	background-color:rgb(255,255,255);
-}
-
-#username {
-	position:relative;
-	width:35%;
-	display:inline-block;
-}
-
-#password {
-	position:relative;
-	width:35%;
-	display:inline-block;
 }
 
 .game {
@@ -166,6 +150,34 @@ footer {
 	height:20%;
 }
 
-.shadow {
-	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+/* --------------------------------- Wishlist ------------------------------- */
+#wishlist {
+	position:relative;
+	display:inline-block;
+	top:10px;
+	right:10px;
+	height:88.2%;
+	width:47%;
+	padding:15px;
+	z-index:10;
+	background-color:rgb(255,255,255);
+}
+
+/* ---------------------------------- Grid ---------------------------------- */
+.wrapper {
+	display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  grid-gap:10px;
+  grid-auto-rows:minmax(100px, auto);
+}
+
+/* --------------------------------- Footer --------------------------------- */
+footer {
+	position:absolute;
+	text-align:center;
+	left:0px;
+	right:0px;
+	bottom:20px;
+	margin:auto;
+	z-index:5;
 }

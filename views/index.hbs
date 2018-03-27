@@ -6,9 +6,9 @@
 		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 	</head>
-	{{> header}}
 	<body>
 		<div id="container">
+			{{> header}}
 			{{#if loggedIn}}
 				{{> loggedin_message}}
 			{{else}}
