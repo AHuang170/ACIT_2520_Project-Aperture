@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/AHuang170/ACIT_2520_Project-Aperture#readme",
   "dependencies": {
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
     "cookie-session": "^2.0.0-beta.3",
     "express": "^4.16.2",
