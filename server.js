@@ -177,7 +177,7 @@ app.post('/loginAuth', (request, response) => {
           
           bcrypt.compare(input_pass, hashed_pass).then(function(authenticated){
             if(authenticated){
-              console.log(hashed_pass);
+              
               request.session.loggedIn = true;
               request.session.userName = input_name;
               request.session.uid = result[0]["uid"];
