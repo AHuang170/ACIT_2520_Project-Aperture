@@ -255,6 +255,57 @@ app.post('/createUser', (request, response) => {
   });
 })
 
+app.post('/addToWishlist', (request, response) => {
+  var input_name = request.body.username
+  var input_pass = request.body.password
+  var resultName = 'numMatch';
+  var query = `SELECT uid FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
+
+  connection.query(query, function(err, result, fields) {
+      if (err) throw err
+
+      if (result.length != 1){
+        request.session.loggedIn = false;
+          response.render('index.hbs', {
+              year: new Date().getFullYear(),
+              failedAuth: true,
+              loggedIn: request.session.loggedIn,
+          });
+      } else {
+        // loggedIn: request.session.loggedIn = true;
+        request.session.loggedIn = true;
+        request.session.userName = input_name;
+        request.session.uid = result[0]["uid"];
+
+        var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
+        connection.query(wishlistQuery, function(err, queryResult, fields){
+          var returnList = [];
+          (async function game_loop(){
+            for (const item of queryResult){
+              var steam_result = await steam(item.appid);
+              var initial_price = parseInt(steam_result.price_overview.initial);
+              var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
+              var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+              var steam_name = `Game Name: ${steam_result.name}`;
+              var steam_price = `Current Price: $${current_price.toString()}`;
+              var steam_discount = `Discount ${disct_percentage}%`;
+              returnList.push([steam_name, steam_price, steam_discount]);
+            }
+            request.session.wishlist = returnList;
+            // console.log
+            response.render('index.hbs', {
+              gameList: request.session.wishlist,
+              year: new Date().getFullYear(),
+              loggedIn: request.session.loggedIn,
+              userName: request.session.userName,
+              failedAuth: false
+            });
+          })();
+        });
+      }
+  });
+});
+
 app.use((request, response) => {
 	response.status(404);
 	response.render('404.hbs');
