@@ -60,12 +60,11 @@ hbs.registerHelper('message', (text) => {
 // [ ['Game Name: OneShot', 'Current Price: $10.99', 'Discount 15%'], [...] ]
 hbs.registerHelper('apps', (list) => {
   var titleList = list.gameList;
-  console.log(list);
-  var out = "<div id='wishlist'>";
+  var out = '';
   for (var item in titleList) {
-    out = out+"<div class='game'><p>"+titleList[item][0]+"</p><p>"+titleList[item][1]+"</p><p>"+titleList[item][2]+"</p></div>";
+    out = out+"<div class='game shadow'><p>"+titleList[item][0]+"</p><p>"+titleList[item][1]+"</p><p>"+titleList[item][2]+"</p></div>";
   }
-  return out + '</div>';
+  return out;
 });
 
 // ----------------------------------- Routes ----------------------------------

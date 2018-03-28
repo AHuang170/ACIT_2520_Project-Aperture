@@ -2,6 +2,7 @@
 
 body {
 	font-family: 'Lato', sans-serif;
+	background-color:rgb(250,250,250);
 }
 
 a {
@@ -47,6 +48,8 @@ header {
 #steam {
 	width:60px;
 	vertical-align: baseline;
+	margin-bottom:8px;
+	margin-left:25px;
 }
 
 #title {
@@ -57,15 +60,19 @@ header {
 	width:20%;
 	z-index:2;
 	vertical-align: top;
+	margin-top:5px;
+	margin-left:20px;
 }
 
 #loginForm {
-	position:relative;
+	position:absolute;
 	display:inline-block;
 	text-align:right;
+	padding:5px;
 	width:74%;
 	height:100%;
 	z-index:12;
+	right:0px;
 }
 
 #username {
@@ -78,6 +85,12 @@ header {
 	position:relative;
 	width:20%;
 	display:inline-block;
+}
+
+#create {
+	position:relative;
+	margin-right:3px;
+	bottom:11px;
 }
 
 #enter-pass {
@@ -119,16 +132,14 @@ header {
 	background-color:rgb(255,255,255);
 }
 
+/* --------------------------------- Wishlist ------------------------------- */
 .game {
 	position:relative;
 	width:100%;
-	height:20%;
-}
-
-/* --------------------------------- Wishlist ------------------------------- */
-#wishlist {
+	height:15%;
 	padding:15px;
 	background-color:rgb(255,255,255);
+	margin:10px;
 }
 
 /* ---------------------------------- Grid ---------------------------------- */
@@ -137,10 +148,11 @@ header {
 	width:100%;
 	height:90%;
 	margin-top:10px;
+	padding:20px;
 	background-color:rgb(250,250,250);
 	display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-gap: 10px;
+  grid-gap: 20px;
   grid-auto-rows: minmax(100px, auto);
 }
 
@@ -155,6 +167,7 @@ header {
 }
 
 .wishlist {
+	margin-top:-10px;
 	grid-column: 3 / 5;
 	grid-row: 1 / 5;
 }
