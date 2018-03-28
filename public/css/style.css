@@ -142,6 +142,15 @@ header {
 	margin:10px;
 }
 
+.game_sale {
+	position:relative;
+	width:100%;
+	height:15%;
+	padding:15px;
+	background-color:rgb(172, 247, 153);
+	margin:10px;
+}
+
 /* ---------------------------------- Grid ---------------------------------- */
 .wrapper {
 	position:absolute;

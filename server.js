@@ -56,20 +56,26 @@ hbs.registerHelper('message', (text) => {
 	return text.toUpperCase();
 })
 
-// Expects a list of lists with the following format:
-// [ ['Game Name: OneShot', 'Current Price: $10.99', 'Discount 15%'], [...] ]
 hbs.registerHelper('apps', (list) => {
   var titleList = list.gameList;
   var out = '';
   for (var item in titleList) {
-    out = out+"<div class='game shadow'><p>"+titleList[item][0]+"</p><p>"+titleList[item][1]+"</p><p>"+titleList[item][2]+"</p></div>";
+    if (titleList[item][2] === 'Discount 0%') {
+      out = out+"<div class='game shadow'><p>"+titleList[item][0]+"</p><p>"+titleList[item][1]+"</p><p>"+titleList[item][2]+"</p></div>";
+    } else {
+      out = out+"<div class='game_sale shadow'><p>"+titleList[item][0]+"</p><p>"+titleList[item][1]+"</p><p>"+titleList[item][2]+"</p></div>";
+    }
   }
   return out;
 });
 
 // ----------------------------------- Routes ----------------------------------
 app.get('/', (request, response) => {
-  var query = 'SELECT * FROM wishlist WHERE uid = 1';
+  var target_id = -1;
+  if (request.session.uid != undefined) {
+    target_id = request.session.uid;
+  }
+  var query = `SELECT * FROM wishlist WHERE uid = ${target_id}`;
   connection.query(query, function(err, queryResult, fields){
     var returnList = [];
     (async function game_loop(){
@@ -94,12 +100,6 @@ app.get('/', (request, response) => {
       });
     })();
   });
-	// response.render('index.hbs', {
-	// 	year: new Date().getFullYear(),
-  //   loggedIn: request.session.loggedIn,
-  //   userName: request.session.userName,
-  //   failedAuth: false
-	// });
 });
 
 app.post('/', (request, response) => {
@@ -150,38 +150,16 @@ app.post('/', (request, response) => {
 	}
 });
 
-// app.get('/wishlist', (request, response) => {
-//   var query = 'SELECT * FROM wishlist WHERE uid = 1';
-//   connection.query(query, function(err, queryResult, fields){
-//     var returnList = [];
-//     (async function game_loop(){
-//       for (const item of queryResult){
-//         var steam_result = await steam(item.appid);
-//         var initial_price = parseInt(steam_result.price_overview.initial);
-//         var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
-//         var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-//         var steam_name = `Game Name: ${steam_result.name}`;
-//         var steam_price = `Current Price: $${current_price.toString()}`;
-//         var steam_discount = `Discount ${disct_percentage}%`;
-//         returnList.push([steam_name, steam_price, steam_discount]);
-//       }
-//       // console.log
-//       response.render('wishlist.hbs', {
-//         gameList: returnList
-//       });
-//     })();
-//   });
-// });
-
 app.post('/loginAuth', (request, response) => {
     var input_name = request.body.username
     var input_pass = request.body.password
     var resultName = 'numMatch';
-    var query = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
+    var query = `SELECT uid FROM users WHERE username = '${input_name}' AND password = '${input_pass}'`;
 
     connection.query(query, function(err, result, fields) {
         if (err) throw err
-        if (result[0][resultName] != 1){
+
+        if (result.length != 1){
           request.session.loggedIn = false;
             response.render('index.hbs', {
 				        year: new Date().getFullYear(),
@@ -192,11 +170,34 @@ app.post('/loginAuth', (request, response) => {
           // loggedIn: request.session.loggedIn = true;
           request.session.loggedIn = true;
           request.session.userName = input_name;
-          response.render('index.hbs', {
-              year: new Date().getFullYear(),
-              loggedIn: request.session.loggedIn,
-              userName: request.session.userName
+          request.session.uid = result[0]["uid"];
+
+          var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
+          connection.query(wishlistQuery, function(err, queryResult, fields){
+            var returnList = [];
+            (async function game_loop(){
+              for (const item of queryResult){
+                var steam_result = await steam(item.appid);
+                var initial_price = parseInt(steam_result.price_overview.initial);
+                var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
+                var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+                var steam_name = `Game Name: ${steam_result.name}`;
+                var steam_price = `Current Price: $${current_price.toString()}`;
+                var steam_discount = `Discount ${disct_percentage}%`;
+                returnList.push([steam_name, steam_price, steam_discount]);
+              }
+              request.session.wishlist = returnList;
+              // console.log
+              response.render('index.hbs', {
+                gameList: request.session.wishlist,
+                year: new Date().getFullYear(),
+                loggedIn: request.session.loggedIn,
+                userName: request.session.userName,
+                failedAuth: false
+              });
+            })();
           });
+
         }
     });
 });
