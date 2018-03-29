@@ -1,4 +1,7 @@
 <div id="welcomeMessage">
   Welcome {{userName}}
-  <a href="/logout">LOGOUT</a>
+  <!-- <a href="/logout">LOGOUT</a> -->
 </div>
+<form action="/logout" method="get">
+  <input id="logout-btn" class="btn btn-primary" type="submit" value="Logout">
+</form>
