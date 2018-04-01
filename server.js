@@ -145,7 +145,7 @@ app.post('/', (request, response) => {
     }, dataList, request.body.game);
     var gameList ='';
     for(i=0; i<10; i++) {
-      gameList += `${result.data[i].name} `;
+      gameList += `${result.data[i].name} <br>`;
     }
 		response.render('index.hbs', {
 			year: new Date().getFullYear(),
