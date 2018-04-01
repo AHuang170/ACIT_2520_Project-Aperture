@@ -150,7 +150,9 @@ app.post('/', (request, response) => {
 		response.render('index.hbs', {
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
-			error: gameList
+      distype: "block",
+      gList: gameList,
+			error: "Game not found.  Select from closest results."
 		});
 	}
 });
