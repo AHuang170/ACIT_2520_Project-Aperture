@@ -55,7 +55,7 @@ header {
 	position:relative;
 	display:inline-block;
 	font-size:2.7em;
-	width:25%;
+	width:260px;
 	z-index:2;
 	padding:5px;
 }
@@ -103,9 +103,10 @@ header {
 }
 
 #welcome{
-	position:relative;
+	position:absolute;
 	text-align:right;
-	width:25%;
+	right:0px;
+	width:220px;
 }
 
 #lgout {

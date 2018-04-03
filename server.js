@@ -73,6 +73,10 @@ hbs.registerHelper('apps', (list) => {
   return out;
 });
 
+hbs.registerHelper('searchResults', (list) => {
+  var resultList = list.searchResults;
+})
+
 // ----------------------------------- Routes ----------------------------------
 app.get('/', (request, response) => {
 
@@ -155,7 +159,7 @@ app.post('/', (request, response) => {
       }, dataList, request.body.game);
       var gameList ='';
       for(i=0; i<10; i++) {
-        gameList += `${result.data[i].name} <br>`;
+        gameList += `<a href="/fetchDetails" target="post">${result.data[i].name}</a><br>`;
       }
       response.render('index.hbs', {
         year: new Date().getFullYear(),
@@ -167,7 +171,11 @@ app.post('/', (request, response) => {
       });
     }
   }
-	
+});
+
+app.post('/fetchDetails', (request, response) => {
+  // Copy code from 'post, /'
+  // Connect helper 'searchResults'
 });
 
 app.post('/loginAuth', (request, response) => {
@@ -189,10 +197,10 @@ app.post('/loginAuth', (request, response) => {
         } else {
           // loggedIn: request.session.loggedIn = true;
           var hashed_pass = result[0]["password"];
-          
+
           bcrypt.compare(input_pass, hashed_pass).then(function(authenticated){
             if(authenticated){
-              
+
               request.session.loggedIn = true;
               request.session.userName = input_name;
               request.session.uid = result[0]["uid"];
@@ -230,7 +238,7 @@ app.post('/loginAuth', (request, response) => {
                 loggedIn: request.session.loggedIn,
               });
             }
-            
+
           });
         }
     });
@@ -293,7 +301,7 @@ app.post('/createUser', (request, response) => {
           })
         });
       });
-      
+
     }
   });
 })
@@ -339,7 +347,7 @@ app.post('/addToWishlist', (request, response) => {
         });
       })();
     });
-  } 
+  }
 });
 
 app.use((request, response) => {
