@@ -1,7 +1,6 @@
-<div id="welcomeMessage">
-  Welcome {{userName}}
-  <!-- <a href="/logout">LOGOUT</a> -->
+<div id="welcome">
+  <div id="welcomeMessage">Welcome {{userName}}</div>
+  <form id="lgout" action="/logout" method="get">
+    <input id="logout-btn" class="btn btn-primary" type="submit" value="Logout">
+  </form>
 </div>
-<form action="/logout" method="get">
-  <input id="logout-btn" class="btn btn-primary" type="submit" value="Logout">
-</form>
