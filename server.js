@@ -289,7 +289,7 @@ app.post('/addToWishlist', (request, response) => {
       failedAuth: true,
       loggedIn: request.session.loggedIn,
     });
-  } else {
+  } else if(request.session.loggedIn == true){
 
     // Step 2 - Write the game id to the database with their userid
     var addQuery = `INSERT INTO wishlist (uid, appid) VALUES (${request.session.uid}, ${request.session.appid})`;
@@ -323,6 +323,13 @@ app.post('/addToWishlist', (request, response) => {
         });
       })();
     });
+  } else {
+    response.render('index.hbs', {
+      year: new Date().getFullYear(),
+      loggedIn: request.session.loggedIn,
+      userName: request.session.userName,
+      failedAuth: false
+    })
   }
 });
 
