@@ -75,6 +75,7 @@ hbs.registerHelper('apps', (list) => {
 
 // ----------------------------------- Routes ----------------------------------
 app.get('/', (request, response) => {
+
   var target_id = -1;
   if (request.session.uid != undefined) {
     target_id = request.session.uid;
@@ -107,55 +108,66 @@ app.get('/', (request, response) => {
 });
 
 app.post('/', (request, response) => {
-	var index = _.findIndex(gameobj['applist'].apps, function(o) {
-    return o.name == request.body.game;
-  });
-
-	if (index != -1) {
-		var appid = gameobj['applist'].apps[index].appid.toString();
-    request.session.appid = appid;
-
-		steam(appid).then((result) => {
-      if(result.is_free == true){
-        var current_price = 'Free';
-      } else {
-        var initial_price = parseInt(result.price_overview.initial);
-  			var disct_percentage = parseInt(result.price_overview.discount_percent);
-  			var current_price = '$'+
-          (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
-      }
-			response.render('index.hbs', {
+  if(request.body.game == ''){
+    response.render('index.hbs', {
         gameList: request.session.wishlist,
-				year: new Date().getFullYear(),
-        failedAuth: false,
+        year: new Date().getFullYear(),
+        loggedIn: request.session.loggedIn,
+        userName: request.session.userName
+    })
+  } else {
+    var index = _.findIndex(gameobj['applist'].apps, function(o) {
+      return o.name == request.body.game;
+    });
+
+    if (index != -1) {
+      var appid = gameobj['applist'].apps[index].appid.toString();
+      request.session.appid = appid;
+
+      steam(appid).then((result) => {
+        if(result.is_free == true){
+          var current_price = 'Free';
+        } else {
+          var initial_price = parseInt(result.price_overview.initial);
+          var disct_percentage = parseInt(result.price_overview.discount_percent);
+          var current_price = '$'+
+            (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
+        }
+        response.render('index.hbs', {
+          gameList: request.session.wishlist,
+          year: new Date().getFullYear(),
+          failedAuth: false,
+          loggedIn: request.session.loggedIn,
+          userName: request.session.userName,
+          gamename: `Game Name: ${result.name}`,
+          price: `Current Price: ${current_price}`,
+          // score: `Metacritic Score: ${result.metacritic.score}%`,
+          discount: `Discount ${disct_percentage}%`,
+          displayDetails: true
+        });
+      }).catch((error)=>{
+          console.log(error);
+      });
+    } else {
+      var result = subsearch.search({
+        rank: subsearch.transforms.rank('name'),
+        noHighlight: subsearch.transforms.noHighlight,
+      }, dataList, request.body.game);
+      var gameList ='';
+      for(i=0; i<10; i++) {
+        gameList += `${result.data[i].name} <br>`;
+      }
+      response.render('index.hbs', {
+        year: new Date().getFullYear(),
         loggedIn: request.session.loggedIn,
         userName: request.session.userName,
-				gamename: `Game Name: ${result.name}`,
-				price: `Current Price: ${current_price}`,
-				// score: `Metacritic Score: ${result.metacritic.score}%`,
-				discount: `Discount ${disct_percentage}%`
-			});
-		}).catch((error)=>{
-        console.log(error);
-		});
-	} else {
-    var result = subsearch.search({
-      rank: subsearch.transforms.rank('name'),
-      noHighlight: subsearch.transforms.noHighlight,
-    }, dataList, request.body.game);
-    var gameList ='';
-    for(i=0; i<10; i++) {
-      gameList += `${result.data[i].name} <br>`;
+        distype: "block",
+        gList: gameList,
+        error: "Game not found.  Select from closest results."
+      });
     }
-		response.render('index.hbs', {
-			year: new Date().getFullYear(),
-      loggedIn: request.session.loggedIn,
-      userName: request.session.userName,
-      distype: "block",
-      gList: gameList,
-			error: "Game not found.  Select from closest results."
-		});
-	}
+  }
+	
 });
 
 app.post('/loginAuth', (request, response) => {
@@ -233,7 +245,8 @@ app.get('/logout', (request, response) => {
 
 app.get('/accCreate', (request, response) => {
   response.render('acc_create.hbs', {
-    creatingUser: true
+    creatingUser: true,
+    noLogIn: true
   });
 });
 
@@ -267,14 +280,17 @@ app.post('/createUser', (request, response) => {
         hasSpace: containsSpace,
         duplicateName: duplicate,
         weakPass: weak_pass,
-        spacePass: pass_space
+        spacePass: pass_space,
+        noLogIn: true
       });
     } else {
       bcrypt.hash(input_user_pass, saltRounds).then(function (hash){
         var addQ = `INSERT INTO users (uid, username, password) VALUES (NULL, '${input_user_name}', '${hash}');`;
         connection.query(addQ, function(err, result, fields) {
           if (err) throw err;
-          response.render('placeholder.hbs')
+          response.render('placeholder.hbs', {
+            noLogIn: true
+          })
         });
       });
       
@@ -284,13 +300,12 @@ app.post('/createUser', (request, response) => {
 
 app.post('/addToWishlist', (request, response) => {
   // Step 1 - Check if a user is logged in. If not, ask them to log in
-  if (request.session.loggedIn == false) {
+  if (request.session.loggedIn != true) {
     response.render('index.hbs', {
       year: new Date().getFullYear(),
-      failedAuth: true,
       loggedIn: request.session.loggedIn,
     });
-  } else if(request.session.loggedIn == true){
+  } else if(request.session.loggedIn === true){
 
     // Step 2 - Write the game id to the database with their userid
     var addQuery = `INSERT INTO wishlist (uid, appid) VALUES (${request.session.uid}, ${request.session.appid})`;
@@ -324,14 +339,7 @@ app.post('/addToWishlist', (request, response) => {
         });
       })();
     });
-  } else {
-    response.render('index.hbs', {
-      year: new Date().getFullYear(),
-      loggedIn: request.session.loggedIn,
-      userName: request.session.userName,
-      failedAuth: false
-    })
-  }
+  } 
 });
 
 app.use((request, response) => {

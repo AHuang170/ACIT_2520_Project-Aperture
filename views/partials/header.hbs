@@ -8,7 +8,10 @@
   {{else}}
   	{{#if creatingUser}}
   	{{else}}
+  		{{#if noLogIn}}
+  		{{else}}
     	{{> login_form}}
+  		{{/if}}
     {{/if}}
   {{/if}}
 </header>
