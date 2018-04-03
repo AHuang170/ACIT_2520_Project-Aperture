@@ -231,7 +231,9 @@ app.get('/logout', (request, response) => {
 });
 
 app.get('/accCreate', (request, response) => {
-  response.render('acc_create.hbs');
+  response.render('acc_create.hbs', {
+    creatingUser: true
+  });
 });
 
 app.post('/createUser', (request, response) => {
@@ -270,7 +272,7 @@ app.post('/createUser', (request, response) => {
       bcrypt.hash(input_user_pass, saltRounds).then(function (hash){
         var addQ = `INSERT INTO users (uid, username, password) VALUES (NULL, '${input_user_name}', '${hash}');`;
         connection.query(addQ, function(err, result, fields) {
-          if (err) throw err
+          if (err) throw err;
           response.render('placeholder.hbs')
         });
       });

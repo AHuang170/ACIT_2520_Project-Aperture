@@ -6,6 +6,9 @@
   {{#if loggedIn}}
     {{> loggedin_message}}
   {{else}}
-    {{> login_form}}
+  	{{#if creatingUser}}
+  	{{else}}
+    	{{> login_form}}
+    {{/if}}
   {{/if}}
 </header>
