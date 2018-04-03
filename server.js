@@ -150,6 +150,7 @@ app.post('/', (request, response) => {
 		response.render('index.hbs', {
 			year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
+      userName: request.session.userName,
       distype: "block",
       gList: gameList,
 			error: "Game not found.  Select from closest results."
