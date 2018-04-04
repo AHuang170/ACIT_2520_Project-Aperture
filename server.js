@@ -33,7 +33,7 @@ connection.query(sql, function(err, rows, fields) {
 });
 // -----------------------------------------------------------------------------
 
-var gamelist = fs.readFileSync('games.json');
+var gamelist = fs.readFileSync('filtered_games.json');
 var gameobj = JSON.parse(gamelist);
 var dataList = {};
 dataList['data'] = gameobj.applist.apps;
