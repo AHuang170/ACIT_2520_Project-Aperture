@@ -74,7 +74,11 @@ hbs.registerHelper('apps', (list) => {
 });
 
 hbs.registerHelper('searchResults', (list) => {
-  var resultList = list.searchResults;
+  var out = '';
+  for (var index in list.searchList) {
+    out = out+`<a href="/fetchDetails?n=${list.searchList[index]}">${list.searchList[index]}</a><br>`;
+  }
+  return out;
 })
 
 // ----------------------------------- Routes ----------------------------------
@@ -153,29 +157,69 @@ app.post('/', (request, response) => {
           console.log(error);
       });
     } else {
+      //_.replace([string=''], pattern, replacement)
+
+      // var gnQuery = _.replace(request.body.game, ' ', '');
       var result = subsearch.search({
         rank: subsearch.transforms.rank('name'),
         noHighlight: subsearch.transforms.noHighlight,
       }, dataList, request.body.game);
-      var gameList ='';
-      for(i=0; i<10; i++) {
-        gameList += `<a href="/fetchDetails" target="post">${result.data[i].name}</a><br>`;
+      var gameList = [];
+      var maxItem = result.data.length;
+      if (maxItem > 10){
+        maxItem = 10;
+      }
+      for(i=0; i<maxItem; i++) {
+
+        var gameName = result.data[i].name;
+        gameList.push(gameName);
       }
       response.render('index.hbs', {
         year: new Date().getFullYear(),
         loggedIn: request.session.loggedIn,
         userName: request.session.userName,
         distype: "block",
-        gList: gameList,
+        searchList: gameList,
         error: "Game not found.  Select from closest results."
       });
     }
   }
 });
 
-app.post('/fetchDetails', (request, response) => {
-  // Copy code from 'post, /'
-  // Connect helper 'searchResults'
+app.get('/fetchDetails', (request, response) => {
+  var index = _.findIndex(gameobj['applist'].apps, function(o) {
+    return o.name == request.query.n;
+  });
+
+  if (index != -1) {
+    var appid = gameobj['applist'].apps[index].appid.toString();
+    request.session.appid = appid;
+
+    steam(appid).then((result) => {
+      if(result.is_free == true){
+        var current_price = 'Free';
+      } else {
+        var initial_price = parseInt(result.price_overview.initial);
+        var disct_percentage = parseInt(result.price_overview.discount_percent);
+        var current_price = '$'+
+          (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
+      }
+      response.render('index.hbs', {
+        gameList: request.session.wishlist,
+        year: new Date().getFullYear(),
+        failedAuth: false,
+        loggedIn: request.session.loggedIn,
+        userName: request.session.userName,
+        gamename: `Game Name: ${result.name}`,
+        price: `Current Price: ${current_price}`,
+        // score: `Metacritic Score: ${result.metacritic.score}%`,
+        discount: `Discount ${disct_percentage}%`,
+        displayDetails: true
+      });
+    }).catch((error)=>{
+        console.log(error);
+    });
+  }
 });
 
 app.post('/loginAuth', (request, response) => {

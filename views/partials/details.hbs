@@ -1,9 +1,11 @@
 <div id="details" class="shadow details">
+  <div id="err">{{error}}</div>
+  {{> list}}
   <p>{{gamename}}</p>
   <p>{{price}}</p>
   <p>{{discount}}</p>
   <p>{{score}}</p>
-  <p>{{error}}</p>
+
   {{#if displayDetails}}
   	<form action="/addToWishlist" method="post">
     	<input id="add-btn" class="btn btn-primary" type="submit" value="Add To Wishlist">
