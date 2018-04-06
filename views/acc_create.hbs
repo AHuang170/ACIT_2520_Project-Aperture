@@ -46,18 +46,28 @@
 	          </div>
 
 	          <div class='formRowRight'>
-
-	            {{#if spacePass}}
-	              <div class="formMessage">Password contains spaces</div>
+							{{#if mismatch}}
+								<div class="formMessage">Passwords do not match</div>
+							{{else}}
+		            {{#if spacePass}}
+		              <div class="formMessage">Password contains spaces</div>
 								{{else}}
 									{{#if weakPass}}
 										<div class="formMessage">Password shorter than 8 chracters</div>
 									{{/if}}
-	            {{/if}}
-
+		            {{/if}}
+							{{/if}}
+							
 	            <input class='formTextInput' type="password" name="acc_pass">
 	          </div>
 	        </div>
+
+					<div class='formRow'>
+						<div class='formRowLeft'>
+							<label class='formLabel' for="rpt_pass">Confirm password:</label>
+						</div>
+						<input class='formTextInput' type="password" name="rpt_pass">
+					</div>
 
 	        <div class='formRow'>
 	          <input class='formSubmit' type="submit" value="Create Account">

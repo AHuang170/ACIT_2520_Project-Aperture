@@ -306,47 +306,40 @@ app.post('/createUser', (request, response) => {
 
   var input_user_name = request.body.acc_name;
   var input_user_pass = request.body.acc_pass;
+  var input_dupe_pass = request.body.rpt_pass;
   var weak_pass = input_user_pass.length < 8;
-  var short_name = input_user_name.length < 6
+  var short_name = input_user_name.length < 6;
   var pass_space = input_user_pass.indexOf(" ") != -1;
   var containsSpace = input_user_name.indexOf(" ") != -1;
-  var resultName = 'numName'
+  var pw_mismatch = input_user_pass != input_dupe_pass;
+  var resultName = 'numName';
 
-  var alreadyExists = new Promise (function(resolve, reject){
-    var nameQuery = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_user_name}'`;
-    var queryResult = false;
-    connection.query(nameQuery, function(err, result, fields) {
-        if (err) throw err
-        if (result[0][resultName] != 0){
-          queryResult = true;
-
-        }
-        resolve(queryResult);
-    });
-  });
-
-  alreadyExists.then(function(duplicate){
-    if (duplicate || weak_pass || pass_space || short_name || containsSpace){
+  alreadyExists(input_user_name, resultName).then((result) => {
+    if (weak_pass || weak_pass || short_name || pass_space || containsSpace || pw_mismatch){
       response.render('acc_create.hbs', {
+        mismatch: pw_mismatch,
         shortName: short_name,
         hasSpace: containsSpace,
-        duplicateName: duplicate,
+        duplicateName: result,
         weakPass: weak_pass,
         spacePass: pass_space,
         noLogIn: true
       });
     } else {
-      bcrypt.hash(input_user_pass, saltRounds).then(function (hash){
+      bcrypt.hash(input_user_pass, saltRounds).then((hash) => {
         var addQ = `INSERT INTO users (uid, username, password) VALUES (NULL, '${input_user_name}', '${hash}');`;
-        connection.query(addQ, function(err, result, fields) {
+        connection.query(addQ, function(err, result, fields){
           if (err) throw err;
-          response.render('placeholder.hbs', {
-            noLogIn: true
-          })
+          response.render('acc_created.hbs', {
+            noLogin: true
+          });
         });
+      }).catch((error) => {
+        serverError(response, error);
       });
-
     }
+  }).catch((error) => {
+    serverError(response, error);
   });
 })
 
@@ -413,4 +406,27 @@ function steam(game_id) {
       resolve(eval(gameData));
     });
   });
+}
+
+var serverError = (response, errorMsg) => {
+  console.log(errorMsg);
+  response.status(500);
+  response.render('500.hbs');
+}
+
+var alreadyExists = (input_user_name, resultName) => {
+  return new Promise((resolve, reject) => {
+    var nameQuery = `SELECT count(*) AS ${resultName} FROM users WHERE username = '${input_user_name}'`;
+    var queryResult = false;
+
+    connection.query(nameQuery, function(err, result, fields) {
+        if (err) {
+          reject(err);
+        }
+        if (result[0][resultName] != 0){
+          queryResult = true;
+        }
+        resolve(queryResult);
+    });
+  })
 }
