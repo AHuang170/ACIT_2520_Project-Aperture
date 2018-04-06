@@ -91,27 +91,19 @@ app.get('/', (request, response) => {
   var query = `SELECT * FROM wishlist WHERE uid = ${target_id}`;
   connection.query(query, function(err, queryResult, fields){
     var returnList = [];
-    (async function game_loop(){
-      for (const item of queryResult){
-        var steam_result = await steam(item.appid);
-        var initial_price = parseInt(steam_result.price_overview.initial);
-        var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
-        var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-        var steam_name = `Game Name: ${steam_result.name}`;
-        var steam_price = `Current Price: $${current_price.toString()}`;
-        var steam_discount = `Discount ${disct_percentage}%`;
-        returnList.push([steam_name, steam_price, steam_discount]);
-      }
-      request.session.wishlist = returnList;
-      // console.log
+
+    game_loop(queryResult).then((result) => {
+      request.session.wishlist = result;
+
       response.render('index.hbs', {
         gameList: request.session.wishlist,
         year: new Date().getFullYear(),
         loggedIn: request.session.loggedIn,
         userName: request.session.userName,
-        failedAuth: false
       });
-    })();
+    }).catch((error) => {
+      serverError(response, error);
+    });
   });
 });
 
@@ -144,7 +136,6 @@ app.post('/', (request, response) => {
         response.render('index.hbs', {
           gameList: request.session.wishlist,
           year: new Date().getFullYear(),
-          failedAuth: false,
           loggedIn: request.session.loggedIn,
           userName: request.session.userName,
           gamename: `Game Name: ${result.name}`,
@@ -175,6 +166,7 @@ app.post('/', (request, response) => {
         gameList.push(gameName);
       }
       response.render('index.hbs', {
+        gameList: request.session.wishlist,
         year: new Date().getFullYear(),
         loggedIn: request.session.loggedIn,
         userName: request.session.userName,
@@ -242,7 +234,6 @@ app.post('/loginAuth', (request, response) => {
                 loggedIn: request.session.loggedIn,
             });
         } else {
-          // loggedIn: request.session.loggedIn = true;
           var hashed_pass = result[0]["password"];
 
           bcrypt.compare(input_pass, hashed_pass).then(function(authenticated){
@@ -254,28 +245,19 @@ app.post('/loginAuth', (request, response) => {
 
               var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
               connection.query(wishlistQuery, function(err, queryResult, fields){
-                var returnList = [];
-                (async function game_loop(){
-                  for (const item of queryResult){
-                    var steam_result = await steam(item.appid);
-                    var initial_price = parseInt(steam_result.price_overview.initial);
-                    var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
-                    var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-                    var steam_name = `Game Name: ${steam_result.name}`;
-                    var steam_price = `Current Price: $${current_price.toString()}`;
-                    var steam_discount = `Discount ${disct_percentage}%`;
-                    returnList.push([steam_name, steam_price, steam_discount]);
-                  }
-                  request.session.wishlist = returnList;
-                  // console.log
+
+                game_loop(queryResult).then((result) => {
+                  request.session.wishlist = result;
+
                   response.render('index.hbs', {
                     gameList: request.session.wishlist,
                     year: new Date().getFullYear(),
                     loggedIn: request.session.loggedIn,
                     userName: request.session.userName,
-                    failedAuth: false
                   });
-                })();
+                }).catch((error) => {
+                  serverError(response, error);
+                })
               });
             } else {
               request.session.loggedIn = false;
@@ -285,7 +267,8 @@ app.post('/loginAuth', (request, response) => {
                 loggedIn: request.session.loggedIn,
               });
             }
-
+          }).catch((error) => {
+            serverError(response, error);
           });
         }
     });
@@ -365,27 +348,19 @@ app.post('/addToWishlist', (request, response) => {
     var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
     connection.query(wishlistQuery, function(err, queryResult, fields){
       var returnList = [];
-      (async function game_loop(){
-        for (const item of queryResult){
-          var steam_result = await steam(item.appid);
-          var initial_price = parseInt(steam_result.price_overview.initial);
-          var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
-          var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
-          var steam_name = `Game Name: ${steam_result.name}`;
-          var steam_price = `Current Price: $${current_price.toString()}`;
-          var steam_discount = `Discount ${disct_percentage}%`;
-          returnList.push([steam_name, steam_price, steam_discount]);
-        }
-        request.session.wishlist = returnList;
-        // console.log
+
+      game_loop(queryResult).then((result) => {
+        request.session.wishlist = result;
+
         response.render('index.hbs', {
           gameList: request.session.wishlist,
           year: new Date().getFullYear(),
           loggedIn: request.session.loggedIn,
           userName: request.session.userName,
-          failedAuth: false
         });
-      })();
+      }).catch((error) => {
+        serverError(response, error);
+      });
     });
   }
 });
@@ -399,14 +374,18 @@ app.listen(8080, () => {
     console.log(`Server is up on the port ${serverPort}`);
 });
 
-function steam(game_id) {
+var steam = (game_id) => {
   return new Promise((resolve, reject) => {
     request({
       url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
       json: true
     }, (error, response, body) => {
-      var gameData = `body[${game_id}].data`;
-      resolve(eval(gameData));
+      if(error){
+        reject(error);
+      } else {
+        var gameData = `body[${game_id}].data`;
+        resolve(eval(gameData));
+      }
     });
   });
 }
@@ -431,5 +410,31 @@ var alreadyExists = (input_user_name, resultName) => {
         }
         resolve(queryResult);
     });
+  })
+}
+
+var game_loop = (queryResult) => {
+  return new Promise (async (resolve, reject) => {
+    var returnList = [];
+
+    for (const item of queryResult){
+      try{
+          var steam_result = await steam(item.appid);
+      }
+      catch (error) {
+        reject(error);
+      }
+
+      var initial_price = parseInt(steam_result.price_overview.initial);
+      var disct_percentage = parseInt(steam_result.price_overview.discount_percent);
+      var current_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2);
+      var steam_name = `Game Name: ${steam_result.name}`;
+      var steam_price = `Current Price: $${current_price.toString()}`;
+      var steam_discount = `Discount ${disct_percentage}%`;
+
+      returnList.push([steam_name, steam_price, steam_discount]);
+
+    }
+    resolve(returnList);
   })
 }

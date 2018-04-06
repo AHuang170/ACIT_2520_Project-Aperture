@@ -11,16 +11,37 @@ var applist = gameobj.applist.apps;
 
 var newGameList = {applist: {apps: []}};
 
+var steam = (game_id) => {
+  return new Promise((resolve, reject) => {
+    request({
+      url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
+      json: true
+    }, (error, response, body) => {
+      setTimeout(() => {
+        if(error){
+          reject(error);
+        } else {
+          var gameData = `body[${game_id}].data`;
+          resolve(eval(gameData));
+        }
+    }, 1000);
+    });
+  });
+}
+
 (async function game_loop(){
   console.log(`Fetching data from ${old_file}, and saving new data to ${new_file}`);
-  for (const item of applist){
 
-    var result = await steam(item.appid);
+  for (const item of applist){
     console.log(`Fetching data for: ${item.appid} - ${item.name}`);
+
+    try{
+        var result = await steam(item.appid);
+    } catch (error) {
+      console.log(error);
+    }
+
     if (result != undefined){
-      
-      //game and DLC
-      //if (result["type"] == 'game' || result["type" == 'dlc']){
 
       if (result["type"] == 'game'){
         newGameList.applist.apps.push(item);
@@ -36,19 +57,3 @@ var newGameList = {applist: {apps: []}};
     }
   })
 })();
-
-function steam(game_id) {
-  return new Promise((resolve, reject) => {
-    request({
-      url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
-      json: true
-    }, (error, response, body) => {
-      var gameData = undefined;
-      if (body[game_id] != undefined){
-        gameData = `body[${game_id}].data`;
-      }
-
-      resolve(eval(gameData));
-    });
-  });
-}
