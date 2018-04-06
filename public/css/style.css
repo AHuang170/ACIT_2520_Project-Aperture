@@ -116,11 +116,10 @@ header {
 }
 
 #failedText {
-	position:fixed;
-	top:2px;
-	right:20px;
-	color:red;
-	z-index:8;
+	position:relative;
+	margin-right:3px;
+	bottom:11px;
+	color: red;
 }
 
 #logout-btn {
@@ -140,6 +139,11 @@ header {
   .header {
 
   }
+}
+
+/* --------------------------------- Account Creation------------------------ */
+.formMessage {
+	color: red
 }
 
 /* --------------------------------- Search --------------------------------- */

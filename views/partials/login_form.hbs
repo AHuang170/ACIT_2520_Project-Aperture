@@ -1,9 +1,6 @@
 <div id="loginForm">
-    {{#if failedAuth}}
-    <div id="failedText">Invalid username or password</div>
-    {{/if}}
-
     <div class="form-group">
+
       <form action="/loginAuth" method="post">
           <label for="username">Username: </label>
           <input id="username" class="form-control" type="text" name="username">
@@ -12,5 +9,12 @@
           <input id="enter-pass" class="btn btn-primary" type="submit" value="LOGIN">
       </form>
     </div>
+    {{#if emptyField}}
+      <label id="failedText">Enter both username and password</label>
+    {{else}}
+      {{#if failedAuth}}
+        <label id="failedText">Invalid username or password</label>
+      {{/if}}
+    {{/if}}
     <a id="create" href="/accCreate">Create new account</a>
 </div>

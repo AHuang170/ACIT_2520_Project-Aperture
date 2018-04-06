@@ -228,6 +228,8 @@ app.post('/loginAuth', (request, response) => {
     var resultName = 'numMatch';
     var query = `SELECT * FROM users WHERE username = '${input_name}'`;
 
+    var empty_field = (input_name == '' || input_pass == '');
+
     connection.query(query, function(err, result, fields) {
         if (err) throw err
 
@@ -236,6 +238,7 @@ app.post('/loginAuth', (request, response) => {
             response.render('index.hbs', {
 				        year: new Date().getFullYear(),
                 failedAuth: true,
+                emptyField: empty_field,
                 loggedIn: request.session.loggedIn,
             });
         } else {
