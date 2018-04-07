@@ -4,8 +4,8 @@ const request = require('request');
 const old_file = "updated_list.json";
 const new_file = "filtered_games_3.json";
 
-const start_index = 0;
-const end_index = 20000;
+const start_index = 40500;
+const end_index = 40501;
 
 var gamelist = fs.readFileSync(old_file);
 var gameobj = JSON.parse(gamelist);
@@ -25,8 +25,13 @@ var steam = (game_id) => {
         if(error){
           reject(error);
         } else {
+          console.log(response.status);
           if (body != undefined){
-            resolve(body[game_id].data);
+            if (body[game_id] != undefined){
+              resolve(body[game_id].data);
+            } else {
+              resolve(undefined);
+            }
           } else {
             resolve(undefined);
           }
