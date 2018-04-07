@@ -49,7 +49,7 @@ var compare_app_lists = (old_obj, current_obj) => {
 				current_index += 1;
 				new_id = current_list[current_index].appid;
 			}
-		} 
+		}
 		current_index += 1;
 
 	}
@@ -77,7 +77,7 @@ var main = () => {
 	// 	console.log(error);
 	// });
 
-	console.log(JSON.parse(fs.readFileSync(new_file)).applist.apps.length);
+	//console.log(JSON.parse(fs.readFileSync(new_file)).applist.apps.length);
 }
 
 main();

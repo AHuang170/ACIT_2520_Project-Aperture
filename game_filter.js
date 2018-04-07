@@ -5,7 +5,7 @@ const old_file = "updated_list.json";
 const new_file = "filtered_games_3.json";
 
 const start_index = 0;
-const end_index = 10;
+const end_index = 20000;
 
 var gamelist = fs.readFileSync(old_file);
 var gameobj = JSON.parse(gamelist);
@@ -15,26 +15,35 @@ var newGameList = {applist: {apps: []}};
 
 var steam = (game_id) => {
   return new Promise((resolve, reject) => {
-    request({
-      url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
-      json: true
-    }, (error, response, body) => {
-      setTimeout(() => {
+    setTimeout(() => {
+
+      request({
+        url: `http://store.steampowered.com/api/appdetails?appids=${game_id}`,
+        json: true
+      }, (error, response, body) => {
+
         if(error){
           reject(error);
         } else {
-          var gameData = `body[${game_id}].data`;
-          resolve(eval(gameData));
+          if (body != undefined){
+            resolve(body[game_id].data);
+          } else {
+            resolve(undefined);
+          }
         }
+
+      });
+
     }, 1000);
-    });
   });
 }
 
 (async function game_loop(){
   console.log(`Fetching data from ${old_file}, and saving new data to ${new_file}`);
   var index = start_index;
-  for (const item of applist){
+  for (var index = start_index; index <= end_index; index++){
+
+    var item = applist[index];
     console.log(`Fetching data for: ${item.appid} - ${item.name}`);
 
     try{
@@ -48,11 +57,6 @@ var steam = (game_id) => {
       if (result["type"] == 'game'){
         newGameList.applist.apps.push(item);
       }
-    }
-
-    index += 1;
-    if (index >= end_index){
-      break;
     }
   }
   console.log(`\n\n==========Fetching Complete==========\n\n`);
