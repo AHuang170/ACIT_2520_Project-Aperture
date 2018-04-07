@@ -2,10 +2,10 @@ const fs = require('fs');
 const request = require('request');
 
 const old_file = "updated_list.json";
-const new_file = "filtered_games_3.json";
+const new_file = "filtered_games_xyw.json";
 
-const start_index = 40500;
-const end_index = 40501;
+const start_index = 20000;
+const end_index = 40000;
 
 var gamelist = fs.readFileSync(old_file);
 var gameobj = JSON.parse(gamelist);
