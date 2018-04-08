@@ -125,14 +125,12 @@ app.post('/', (request, response) => {
       request.session.appid = appid;
 
       steam(appid).then((result) => {
-        if(result.is_free == true){
-          var current_price = 'Free';
-        } else {
-          var initial_price = parseInt(result.price_overview.initial);
-          var disct_percentage = parseInt(result.price_overview.discount_percent);
-          var current_price = '$'+
-            (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
-        }
+
+        var initial_price = parseInt(result.price_overview.initial);
+        var disct_percentage = parseInt(result.price_overview.discount_percent);
+        var current_price = '$'+
+          (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
+
         response.render('index.hbs', {
           gameList: request.session.wishlist,
           year: new Date().getFullYear(),
@@ -188,14 +186,14 @@ app.get('/fetchDetails', (request, response) => {
     request.session.appid = appid;
 
     steam(appid).then((result) => {
-      if(result.is_free == true){
-        var current_price = 'Free';
-      } else {
-        var initial_price = parseInt(result.price_overview.initial);
-        var disct_percentage = parseInt(result.price_overview.discount_percent);
-        var current_price = '$'+
-          (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
-      }
+
+      var initial_price = parseInt(result.price_overview.initial);
+      var disct_percentage = parseInt(result.price_overview.discount_percent);
+
+      var final_price = (initial_price * (1 - (disct_percentage / 100))/100).toFixed(2).toString();
+
+      var current_price = `$${final_price}`;
+
       response.render('index.hbs', {
         gameList: request.session.wishlist,
         year: new Date().getFullYear(),
@@ -338,30 +336,45 @@ app.post('/addToWishlist', (request, response) => {
     });
   } else if(request.session.loggedIn === true){
 
-    // Step 2 - Write the game id to the database with their userid
-    var addQuery = `INSERT INTO wishlist (uid, appid) VALUES (${request.session.uid}, ${request.session.appid})`;
-    connection.query(addQuery, function(err, result, fields) {
+
+    // Pre-Step 2 - check for duplicate entry
+    var chkQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid} AND appid = ${request.session.appid}`;
+
+    connection.query(chkQuery, function(err, result, fields) {
       if (err) throw err
-    });
 
-    // Step 3 - Get all their games from the database, and update the wishlist
-    var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
-    connection.query(wishlistQuery, function(err, queryResult, fields){
-      var returnList = [];
+      var duplicate = (result.length != 0);
 
-      game_loop(queryResult).then((result) => {
-        request.session.wishlist = result;
-
-        response.render('index.hbs', {
-          gameList: request.session.wishlist,
-          year: new Date().getFullYear(),
-          loggedIn: request.session.loggedIn,
-          userName: request.session.userName,
+      // Step 2 - Write the game id to the database with their userid
+      if (!duplicate){
+        var addQuery = `INSERT INTO wishlist (uid, appid) VALUES (${request.session.uid}, ${request.session.appid})`;
+        connection.query(addQuery, function(err, result, fields) {
+          if (err) throw err
         });
-      }).catch((error) => {
-        serverError(response, error);
+      }
+
+      // Step 3 - Get all their games from the database, and update the wishlist
+      var wishlistQuery = `SELECT * FROM wishlist WHERE uid = ${request.session.uid}`;
+      connection.query(wishlistQuery, function(err, queryResult, fields){
+        var returnList = [];
+
+        game_loop(queryResult).then((result) => {
+          request.session.wishlist = result;
+
+          response.render('index.hbs', {
+            gameList: request.session.wishlist,
+            year: new Date().getFullYear(),
+            loggedIn: request.session.loggedIn,
+            userName: request.session.userName,
+            badAdd: duplicate
+          });
+        }).catch((error) => {
+          serverError(response, error);
+        });
       });
+
     });
+
   }
 });
 
@@ -383,7 +396,16 @@ var steam = (game_id) => {
       if(error){
         reject(error);
       } else {
-        var gameData = `body[${game_id}].data`;
+
+        var gameData = Object.assign({}, body[game_id].data);
+
+        if(gameData.price_overview == undefined){
+          gameData.price_overview = {
+            initial: 0,
+            discount_percent: 0
+          };
+        }
+
         resolve(eval(gameData));
       }
     });

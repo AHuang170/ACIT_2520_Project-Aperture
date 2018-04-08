@@ -1,4 +1,7 @@
 <div id="details" class="shadow details">
+  {{#if badAdd}}
+    <div class='formMessage'>Item already exists in wishlist..</div>
+  {{/if}}
   <div id="err">{{error}}</div>
   {{> list}}
   <p>{{gamename}}</p>
