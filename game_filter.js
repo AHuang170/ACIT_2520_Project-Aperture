@@ -47,7 +47,9 @@ var steam = (game_id) => {
   console.log(`Fetching data from ${old_file}, and saving new data to ${new_file}`);
   var index = start_index;
   for (var index = start_index; index <= end_index; index++){
-
+    if (index > applist.length){
+      break;
+    }
     var item = applist[index];
     console.log(`Fetching data for: ${item.appid} - ${item.name}`);
 
