@@ -333,6 +333,7 @@ app.post('/addToWishlist', (request, response) => {
     response.render('index.hbs', {
       year: new Date().getFullYear(),
       loggedIn: request.session.loggedIn,
+      error: `Please login first to add to wishlist.`
     });
   } else if(request.session.loggedIn === true){
 
